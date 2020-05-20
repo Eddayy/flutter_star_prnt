@@ -18,12 +18,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    print(await FlutterStarPrnt.platformVersion);
     expect(await FlutterStarPrnt.platformVersion, '42');
-  });
-
-  test('portDiscovery', () async {
-    print(await FlutterStarPrnt.portDiscovery('all'));
-    expect(await FlutterStarPrnt.portDiscovery('all'), '31');
   });
 }
