@@ -93,9 +93,9 @@ public class FlutterStarPrntPlugin implements FlutterPlugin, MethodCallHandler {
       try {
         if (type.equals("LAN")) {
           response = getPortDiscovery("LAN");
-        } else if (strInterface.equals("Bluetooth")) {
+        } else if (type.equals("Bluetooth")) {
           response = getPortDiscovery("Bluetooth");
-        } else if (strInterface.equals("USB")) {
+        } else if (type.equals("USB")) {
           response = getPortDiscovery("USB");
         } else {
           response = getPortDiscovery("All");
