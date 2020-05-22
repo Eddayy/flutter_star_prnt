@@ -1,24 +1,63 @@
 import 'dart:async';
-
 import 'package:flutter/services.dart';
+import 'package:flutter_star_prnt/enums.dart';
+import 'package:flutter_star_prnt/portInfo.dart';
+export 'enums.dart';
+export 'portInfo.dart';
+import 'package:flutter/foundation.dart';
 
 class FlutterStarPrnt {
   static const MethodChannel _channel =
       const MethodChannel('flutter_star_prnt');
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
+  static Future<List<PortInfo>> portDiscovery(PortType portType) async {
+    String type;
+    switch (portType) {
+      case PortType.all:
+        type = 'All';
+        break;
+      case PortType.lan:
+        type = 'LAN';
+        break;
+      case PortType.bluetooth:
+        type = 'Bluetooth';
+        break;
+      case PortType.usb:
+        type = 'USB';
+        break;
+    }
+    dynamic result =
+        await _channel.invokeMethod('portDiscovery', {'type': type});
+    if (result is List) {
+      return result.map<PortInfo>((port) {
+        return PortInfo(port);
+      }).toList();
+    } else {
+      return null;
+    }
   }
 
-  static Future<dynamic> portDiscovery(String type) async {
-    try {
-      return await _channel.invokeMethod('portDiscovery', {'type': type});
-    } on PlatformException catch (err) {
-      print("Error  ${err.message}");
-      // Handle err
-    } catch (err) {
-      // other types of Exceptions
-    }
+  static Future<dynamic> checkStatus({
+    @required String portName,
+    @required String emulation,
+  }) async {
+    dynamic result = await _channel.invokeMethod('checkStatus', {
+      'portName': portName,
+      'emulation': emulation,
+    });
+    return result;
+  }
+
+  static Future<dynamic> connect({
+    @required String portName,
+    @required String emulation,
+    bool hasBarcodeReader = false,
+  }) async {
+    dynamic result = await _channel.invokeMethod('connect', {
+      'portName': portName,
+      'emulation': emulation,
+      'hasBarcodeReader': hasBarcodeReader,
+    });
+    return result;
   }
 }
