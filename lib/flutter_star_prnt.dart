@@ -2,9 +2,12 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_star_prnt/enums.dart';
 import 'package:flutter_star_prnt/portInfo.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_star_prnt/prnt_commands.dart';
+
 export 'enums.dart';
 export 'portInfo.dart';
-import 'package:flutter/foundation.dart';
+export 'prnt_commands.dart';
 
 class FlutterStarPrnt {
   static const MethodChannel _channel =
@@ -44,6 +47,18 @@ class FlutterStarPrnt {
     dynamic result = await _channel.invokeMethod('checkStatus', {
       'portName': portName,
       'emulation': emulation,
+    });
+    return result;
+  }
+  static Future<dynamic> print({
+    @required String portName,
+    @required String emulation,
+    @required PrntCommands printCommands
+  }) async {
+    dynamic result = await _channel.invokeMethod('print', {
+      'portName': portName,
+      'emulation': emulation,
+      'printCommands' :printCommands.getCommands(),
     });
     return result;
   }
