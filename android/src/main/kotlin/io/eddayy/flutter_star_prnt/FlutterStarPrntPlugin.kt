@@ -94,8 +94,8 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         "checkStatus" -> {
           checkStatus(call,result)
         }
-        "connect" -> {
-          connect(call,result)
+        "print" -> {
+          print(call,result)
         }
         else -> result.notImplemented()
       }
@@ -131,7 +131,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     }
   }
   public fun portDiscovery(@NonNull call: MethodCall, @NonNull result: Result) {
-    val strInterface: String? = call.argument<String>("type")
+    val strInterface: String = call.argument<String>("type") as String
     val response: MutableList<Map<String, String>>
     try{
       if (strInterface == "LAN") {
@@ -145,12 +145,12 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       }
       result.success(response)
     } catch (e: StarIOPortException) {
-      result.error("PORT_DISCOVERY_ERROR",e.message,null)
+      result.error("PORT_DISCOVERY_ERROR",e.message,e)
     }
   }
   public fun checkStatus(@NonNull call: MethodCall, @NonNull result: Result) {
-    val portName: String? = call.argument<String>("portName")
-    val emulation: String? = call.argument<String>("emulation")
+    val portName: String = call.argument<String>("portName") as String
+    val emulation: String = call.argument<String>("emulation") as String
 
     var port :StarIOPort? = null ;
     try {
@@ -177,13 +177,13 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       json.put("FirmwareVersion", firmwareInformationMap.get("FirmwareVersion"))
       result.success(json)
     } catch (e :Exception) {
-      result.error("CHECK_STATUS_ERROR",e.message,null)
+      result.error("CHECK_STATUS_ERROR",e.message,e)
     } finally {
       if (port != null) {
         try {
          StarIOPort.releasePort(port);
         } catch (e :StarIOPortException) {
-          result.error("CHECK_STATUS_ERROR",e.message,null)
+          result.error("CHECK_STATUS_ERROR",e.message,e)
         }
       }
 
@@ -191,9 +191,10 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
   }
   //cant run this on main thread, check this later
   public fun connect(@NonNull call: MethodCall, @NonNull result: Result) {
-    val portName: String? = call.argument<String>("portName")
-    val emulation: String? = call.argument<String>("emulation")
-    val hasBarcodeReader: Boolean? = call.argument<Boolean>("hasBarcodeReader")
+    val portName: String = call.argument<String>("portName") as String
+    val emulation: String = call.argument<String>("emulation") as String
+    val hasBarcodeReader: Boolean? = call.argument<Boolean>("hasBarcodeReader") as Boolean 
+
     val portSettings:String? = getPortSettingsOption(emulation);
     try {
       var starIoExtManager = this.starIoExtManager
@@ -225,24 +226,19 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         }
       });
     } catch (e :Exception) {
-      result.error("CONNECT_ERROR",e.message,null)
+      result.error("CONNECT_ERROR",e.message,e)
     } 
   }
   public fun print(@NonNull call: MethodCall, @NonNull result: Result) {
-    val portName: String? = call.argument<String>("portName")
-    val emulation: String? = call.argument<String>("emulation")
-    val printCommands: ArrayList<Map<String,Any>>? = call.argument<ArrayList<Map<String,Any>>>("printCommands")
+    val portName: String = call.argument<String>("portName") as String
+    val emulation: String = call.argument<String>("emulation") as String
+    val printCommands: ArrayList<Map<String,Any>> = call.argument<ArrayList<Map<String,Any>>>("printCommands") as ArrayList<Map<String,Any>>
 
     val builder :ICommandBuilder = StarIoExt.createCommandBuilder(getEmulation(emulation))
     builder.beginDocument()
     appendCommands(builder, printCommands, applicationContext);
     builder.endDocument()
-    if (portName == "null") { // use StarIOExtManager
-      sendCommand(builder.getCommands(), starIoExtManager.getPort(), promise)
-    } else {//use StarIOPort
-      sendCommand(context, portName, portSettings, builder.getCommands(), promise);
-    }
-
+    sendCommand(portName, getPortSettingsOption(emulation), builder.getCommands(), applicationContext, result);
   }
    
   private fun getPortDiscovery(@NonNull interfaceName: String): MutableList<Map<String, String>> {
@@ -296,7 +292,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     return arrayPorts
   }
 
-  private fun getPortSettingsOption(emulation:String?):String? { // generate the portsettings depending on the emulation type
+  private fun getPortSettingsOption(emulation:String):String { // generate the portsettings depending on the emulation type
     when(emulation){
       "EscPosMobile" -> return "mini"
       "EscPos" -> return "escpos"
@@ -595,7 +591,36 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     canvas.drawColor(Color.WHITE);
     canvas.translate(0.toFloat(), 0.toFloat());
     staticLayout.draw(canvas);
-
     return bitmap;
-}
+  }
+    private fun sendCommand(portName :String, portSettings :String , commands: ByteArray,context : Context,@NonNull result: Result){
+      var port :StarIOPort? = null ;
+      try {  
+        port = StarIOPort.getPort(portName, portSettings, 10000, applicationContext);
+        try {
+          Thread.sleep(100);
+        } catch (e: InterruptedException) {
+        }
+        var status :StarPrinterStatus = port.beginCheckedBlock();
+        if (status.offline) {
+          throw StarIOPortException("A printer is offline");
+        }
+        port.writePort(commands, 0, commands.size);
+        port.setEndCheckedBlockTimeoutMillis(30000);// Change the timeout time of endCheckedBlock method.
+        status = port.endCheckedBlock();
+        if (status.coverOpen) {
+          result.error("STARIO_PORT_EXCEPTION", "Cover open",null);
+          return;
+        } else if (status.receiptPaperEmpty) {
+          result.error("STARIO_PORT_EXCEPTION","Empty paper",null)
+          return;
+        } else if (status.offline) {
+          result.error("STARIO_PORT_EXCEPTION", "Printer offline",null);
+          return;
+        }
+        result.success("Success!");
+      } catch (e :Exception) {
+        result.error("STARIO_PORT_EXCEPTION",e.message,e)
+      }
+    }
 }

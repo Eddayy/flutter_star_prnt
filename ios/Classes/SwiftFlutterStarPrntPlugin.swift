@@ -1,5 +1,7 @@
 import Flutter
 import UIKit
+import StarIO
+import StarIO_Extension
 
 public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -9,6 +11,9 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch (call.method) {
+
+    }
     result("iOS " + UIDevice.current.systemVersion)
   }
 }
