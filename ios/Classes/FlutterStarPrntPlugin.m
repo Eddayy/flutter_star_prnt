@@ -6,6 +6,9 @@
 // is not copied when this plugin is created as a library.
 // https://forums.swift.org/t/swift-static-libraries-dont-copy-generated-objective-c-header/19816
 #import "flutter_star_prnt-Swift.h"
+#import <StarIO/SMPortSwift.h>
+#import <StarIO_Extension/StarIoExt.h>
+#import <StarIO_Extension/StarIoExtManager.h>
 #endif
 
 @implementation FlutterStarPrntPlugin

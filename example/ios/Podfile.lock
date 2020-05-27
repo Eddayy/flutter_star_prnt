@@ -1,0 +1,34 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_star_prnt (0.0.1):
+    - Flutter
+    - StarIO
+    - StarIO_Extension
+  - StarIO (2.7.0)
+  - StarIO_Extension (1.14.0):
+    - StarIO
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_star_prnt (from `.symlinks/plugins/flutter_star_prnt/ios`)
+
+SPEC REPOS:
+  trunk:
+    - StarIO
+    - StarIO_Extension
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_star_prnt:
+    :path: ".symlinks/plugins/flutter_star_prnt/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_star_prnt: 2680055c4c7c8c9870b5d29edcccee86888e23c0
+  StarIO: 2d29cff48971173f40191dc9b3e23e5a6863b9da
+  StarIO_Extension: 99eb938cd82cea249f298fe5a35074e9aaedf6d7
+
+PODFILE CHECKSUM: 6035709fdc72081501aab357b970673ce49765ba
+
+COCOAPODS: 1.8.4
