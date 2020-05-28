@@ -296,7 +296,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     when(emulation){
       "EscPosMobile" -> return "mini"
       "EscPos" -> return "escpos"
-      "StarPRNT","StarPRNTL" -> return "Portable;"
+      "StarPRNT","StarPRNTL" -> return "Portable;l"
       else -> return emulation
     }
   }
@@ -337,7 +337,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       else if (it.containsKey("openCashDrawer")) builder.appendPeripheral(getPeripheralChannel(it.get("openCashDrawer") as Int))
       else if (it.containsKey("appendBlackMark")) builder.appendBlackMark(getBlackMarkType(it.get("appendBlackMark").toString()))
       else if (it.containsKey("appendBytes")) builder.append(it.get("appendBytes").toString().toByteArray(encoding)) //TODO: test this in the future 
-      else if (it.containsKey("appendRawBytes")) builder.append(it.get("appendRawBytes").toString().toByteArray(encoding)) //TODO: test this in the future 
+      else if (it.containsKey("appendRawBytes")) builder.appendRaw(it.get("appendRawBytes").toString().toByteArray(encoding)) //TODO: test this in the future 
       else if (it.containsKey("appendAbsolutePosition")) {
         if(it.containsKey("data")) builder.appendAbsolutePosition((it.get("data").toString().toByteArray(encoding)), (it.get("appendAbsolutePosition").toString()).toInt());
         else builder.appendAbsolutePosition((it.get("appendAbsolutePosition").toString()).toInt());
