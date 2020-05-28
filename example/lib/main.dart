@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
                 List<PortInfo> list =
                     await FlutterStarPrnt.portDiscovery(PortType.all);
                 print(list);
-                print('test');
                 list.forEach((port) async {
                   print(port.portName);
                   if (port.portName.isNotEmpty) {
