@@ -618,7 +618,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
           result.error("STARIO_PORT_EXCEPTION", "Printer offline",null);
           return;
         }
-        result.success("Success!");
+        result.success("Success");
       } catch (e :Exception) {
         result.error("STARIO_PORT_EXCEPTION",e.message,e)
       }
