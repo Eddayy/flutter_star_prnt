@@ -16,6 +16,8 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
             case "checkStatus":
                 checkStatus(call, result: result)
                 break;
+            case "print":
+                print(call, result: result)
             default:
                 result(FlutterMethodNotImplemented)
       }
@@ -60,7 +62,9 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         var status: StarPrinterStatus_2 = StarPrinterStatus_2()
         do {
             port = try SMPort.getPort(portName: portName, portSettings: getPortSettingsOption(emulation), ioTimeoutMillis: 10000)
-            
+            defer {
+                SMPort.release(port)
+            }
             if #available(iOS 11.0, *){
                 if(portName.uppercased().hasPrefix("BT:")) {
                     usleep(200000) //sleep 0.2 seconds
@@ -86,7 +90,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         let arguments = call.arguments as! Dictionary<String, AnyObject>
         let portName = arguments["portName"] as! String
         let emulation = arguments["emulation"] as! String
-        let printCommands = arguments["emulation"] as! Array<Dictionary<String,Any>>
+        let printCommands = arguments["printCommands"] as! Array<Dictionary<String,Any>>
 
         
         let portSettings :String = getPortSettingsOption(emulation)
@@ -95,6 +99,8 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         builder.beginDocument()
         appendCommands(builder: builder, printCommands: printCommands)
         builder.endDocument()
+        sendCommand(portName: portName, portSetting: portSettings, command: [UInt8](builder.commands),result: result)
+        
     }
     
     func portInfoToDictionary(portInfo: PortInfo) -> Dictionary<String,String>{
@@ -609,14 +615,10 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func imageWithString(string: String, font: UIFont, width: CGFloat) -> UIImage? {
-        let attributeDic = [
-            NSAttributedString.Key: UIFont
-            ]()
-            
         let size = string.boundingRect(
             with: CGSize(width: width, height: 10000),
             options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
-            attributes: attributeDic,
+            attributes: [NSAttributedString.Key.font : font] ,
             context: nil).size
 
         if UIScreen.main.responds(to: #selector(getter: UIScreen.scale)) {
@@ -650,7 +652,36 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
 
         return imageToPrint
     }
-    
+    func sendCommand(portName:String,portSetting:String,command:[UInt8],result: FlutterResult){
+        var port :SMPort
+        var status: StarPrinterStatus_2 = StarPrinterStatus_2()
+
+        do {
+            port = try SMPort.getPort(portName: portName, portSettings: portSetting, ioTimeoutMillis: 10000)
+            defer {
+                SMPort.release(port)
+            }
+            usleep(200000)
+            try port.beginCheckedBlock(starPrinterStatus: &status, level: 2)
+            if status.offline == SM_TRUESHARED {
+                result(
+                    FlutterError.init(code: "STARIO_PRINT_EXCEPTION", message: "printer is offline", details: nil)
+                )
+            }
+            var total: UInt32 = 0
+            while total < UInt32(command.count) {
+                var written: UInt32 = 0
+                try port.write(writeBuffer: command, offset: total, size: UInt32(command.count) - total, numberOfBytesWritten: &written)
+                total += written
+            }
+            try port.endCheckedBlock(starPrinterStatus: &status, level: 2)
+            result("Success")
+        } catch {
+            result(
+              FlutterError.init(code: "STARIO_PRINT_EXCEPTION", message: error.localizedDescription, details: nil)
+          )
+        }
+    }
 
 
 }

@@ -68,7 +68,6 @@ class _MyAppState extends State<MyApp> {
                           "Refunds and Exchanges\n" +
                           "Within 30 days with receipt\n" +
                           "And tags attached\n",
-                      'fontSize': 25, //Defaults to 25
                     };
                     commands.push(rasterMap);
                     print(await FlutterStarPrnt.print(
