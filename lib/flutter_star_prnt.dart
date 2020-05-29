@@ -3,34 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_star_prnt/enums.dart';
 import 'package:flutter_star_prnt/portInfo.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_star_prnt/prnt_commands.dart';
+import 'package:flutter_star_prnt/print_commands.dart';
 
 export 'enums.dart';
 export 'portInfo.dart';
-export 'prnt_commands.dart';
+export 'print_commands.dart';
 
-class FlutterStarPrnt {
+class StarPrnt {
   static const MethodChannel _channel =
       const MethodChannel('flutter_star_prnt');
-
-  static Future<List<PortInfo>> portDiscovery(PortType portType) async {
-    String type;
-    switch (portType) {
-      case PortType.all:
-        type = 'All';
-        break;
-      case PortType.lan:
-        type = 'LAN';
-        break;
-      case PortType.bluetooth:
-        type = 'Bluetooth';
-        break;
-      case PortType.usb:
-        type = 'USB';
-        break;
-    }
+  static Future<List<PortInfo>> portDiscovery(StarPortType portType) async {
     dynamic result =
-        await _channel.invokeMethod('portDiscovery', {'type': type});
+        await _channel.invokeMethod('portDiscovery', {'type': portType.text});
     if (result is List) {
       return result.map<PortInfo>((port) {
         return PortInfo(port);
@@ -50,15 +34,15 @@ class FlutterStarPrnt {
     });
     return result;
   }
-  static Future<dynamic> print({
-    @required String portName,
-    @required String emulation,
-    @required PrntCommands printCommands
-  }) async {
+
+  static Future<dynamic> print(
+      {@required String portName,
+      @required String emulation,
+      @required PrintCommands printCommands}) async {
     dynamic result = await _channel.invokeMethod('print', {
       'portName': portName,
       'emulation': emulation,
-      'printCommands' :printCommands.getCommands(),
+      'printCommands': printCommands.getCommands(),
     });
     return result;
   }

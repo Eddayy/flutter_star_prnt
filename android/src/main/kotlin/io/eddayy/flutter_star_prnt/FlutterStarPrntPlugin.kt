@@ -389,7 +389,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         val bitmap :Bitmap = createBitmapFromText(text, fontSize, width, typeface);
         val rotation :ICommandBuilder.BitmapConverterRotation = if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString()) else getConverterRotation("Normal")
         if(it.containsKey("absolutePosition")){
-            builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, (it.get("absolutePosition").toString()).toInt());
+            builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, it.get("absolutePosition") as Int);
         }else if(it.containsKey("alignment")){
             builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, getAlignment(it.get("alignment").toString()));
         }else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation);
