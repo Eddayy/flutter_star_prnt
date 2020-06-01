@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_star_prnt/flutter_star_prnt.dart';
 
 void main() => runApp(MyApp());
@@ -12,8 +9,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
   @override
   void initState() {
     super.initState();
@@ -30,17 +25,17 @@ class _MyAppState extends State<MyApp> {
           child: FlatButton(
               onPressed: () async {
                 List<PortInfo> list =
-                    await FlutterStarPrnt.portDiscovery(PortType.all);
+                    await StarPrnt.portDiscovery(StarPortType.All);
                 print(list);
                 list.forEach((port) async {
                   print(port.portName);
                   if (port.portName.isNotEmpty) {
-                    print(await FlutterStarPrnt.checkStatus(
+                    print(await StarPrnt.checkStatus(
                       portName: port.portName,
                       emulation: 'StarGraphic',
                     ));
 
-                    PrntCommands commands = PrntCommands();
+                    PrintCommands commands = PrintCommands();
                     Map<String, dynamic> rasterMap = {
                       'appendBitmapText': "        Star Clothing Boutique\n" +
                           "             123 Star Road\n" +
@@ -70,7 +65,7 @@ class _MyAppState extends State<MyApp> {
                           "And tags attached\n",
                     };
                     commands.push(rasterMap);
-                    print(await FlutterStarPrnt.print(
+                    print(await StarPrnt.print(
                         portName: port.portName,
                         emulation: 'StarGraphic',
                         printCommands: commands));
