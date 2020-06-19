@@ -17,6 +17,7 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   s.dependency 'StarIO' ,'2.7.0' 
   s.dependency 'StarIO_Extension' , '1.14.0'
+  s.static_framework = true
   s.platform = :ios, '8.0'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

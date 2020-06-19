@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_star_prnt (0.0.1):
     - Flutter
-    - StarIO
-    - StarIO_Extension
+    - StarIO (= 2.7.0)
+    - StarIO_Extension (= 1.14.0)
   - StarIO (2.7.0)
   - StarIO_Extension (1.14.0):
     - StarIO
@@ -25,7 +25,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_star_prnt: 2680055c4c7c8c9870b5d29edcccee86888e23c0
+  flutter_star_prnt: 6706d99eaf4a38aef870a09aeae6b9c881001b56
   StarIO: 2d29cff48971173f40191dc9b3e23e5a6863b9da
   StarIO_Extension: 99eb938cd82cea249f298fe5a35074e9aaedf6d7
 
