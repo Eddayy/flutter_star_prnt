@@ -1,6 +1,6 @@
 name: flutter_star_prnt
 description: Flutter plugin for star micromics printers. This plugin allows both android and IOS devices to find star micromics printers and us them to print.
-version: 1.0.2
+version: 1.0.3
 author: Edmund Tay <edmundtay96@gmail.com>
 homepage: https://github.com/Eddayy/flutter_star_prnt
 

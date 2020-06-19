@@ -1,3 +1,7 @@
+## 1.0.3
+
+* Fixed unable to find dependency on ios
+
 ## 1.0.2
 
 * Fixed The 'Pods-Runner' target has transitive dependencies that include static frameworks bug
