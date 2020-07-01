@@ -1,3 +1,7 @@
+## 1.0.4
+
+* Fixed crash cause by exceptions on android
+
 ## 1.0.3
 
 * Fixed unable to find dependency on ios
