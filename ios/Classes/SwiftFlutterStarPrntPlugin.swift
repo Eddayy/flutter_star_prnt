@@ -1,5 +1,7 @@
 import Flutter
 import UIKit
+import StarIO
+import StarIO_Extension
 
 public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {

@@ -1,0 +1,5 @@
+module StarIO_Extension {
+  header "../../../example/ios/Pods/StarIO_Extension/StarIO_Extension.framework/Headers/StarIoExt.h"
+  header "../../../example/ios/Pods/StarIO_Extension/StarIO_Extension.framework/Headers/StarIoExtManager.h"
+  export *
+}

@@ -1,0 +1,4 @@
+module StarIO {
+  header "../../../example/ios/Pods/StarIO/StarIO.framework/Headers/SMPortSwift.h"
+  export *
+}
