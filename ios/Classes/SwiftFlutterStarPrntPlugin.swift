@@ -273,7 +273,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getInternational(_ internationl: String?) -> SCBInternationalType {
-        if (internationl ?? "").isEmpty {
+        if !(internationl ?? "").isEmpty {
             if (internationl == "US") || (internationl == "USA") {
                 return SCBInternationalType.USA
             } else if (internationl == "FR") || (internationl == "France") {
@@ -314,7 +314,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getEncoding(_ encoding: String?) -> String.Encoding {
-        if (encoding ?? "").isEmpty {
+        if !(encoding ?? "").isEmpty {
             if (encoding == "US-ASCII") {
                 return .ascii //English
             } else if (encoding == "Windows-1252") {
@@ -336,7 +336,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getCodePageType(_ codePageType: String?) -> SCBCodePageType {
-        if (codePageType ?? "").isEmpty {
+        if !(codePageType ?? "").isEmpty {
             if (codePageType == "CP437") {
                 return SCBCodePageType.CP437
             } else if (codePageType == "CP737") {
@@ -425,7 +425,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getFont(_ font: String?) -> SCBFontStyleType {
-        if (font ?? "").isEmpty {
+        if !(font ?? "").isEmpty {
             if (font == "A") {
                 return SCBFontStyleType.A
             } else if (font == "B") {
@@ -438,7 +438,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getCutPaperAction(_ cutPaperAction: String?) -> SCBCutPaperAction {
-        if (cutPaperAction ?? "").isEmpty {
+        if !(cutPaperAction ?? "").isEmpty {
             if (cutPaperAction == "FullCut") {
                 return SCBCutPaperAction.fullCut
             } else if (cutPaperAction == "FullCutWithFeed") {
@@ -468,7 +468,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getBlackMarkType(_ blackMarkType: String?) -> SCBBlackMarkType {
-        if (blackMarkType ?? "").isEmpty {
+        if !(blackMarkType ?? "").isEmpty {
             if (blackMarkType == "Valid") {
                 return SCBBlackMarkType.valid
             } else if (blackMarkType == "Invalid") {
@@ -483,7 +483,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getAlignment(_ alignment: String?) -> SCBAlignmentPosition {
-        if (alignment ?? "").isEmpty {
+        if !(alignment ?? "").isEmpty {
             if alignment?.caseInsensitiveCompare("left") == .orderedSame {
                 return SCBAlignmentPosition.left
             } else if alignment?.caseInsensitiveCompare("center") == .orderedSame {
@@ -498,7 +498,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getLogoSize(_ logoSize: String?) -> SCBLogoSize {
-        if (logoSize ?? "").isEmpty {
+        if !(logoSize ?? "").isEmpty {
             if (logoSize == "Normal") {
                 return SCBLogoSize.normal
             } else if (logoSize == "DoubleWidth") {
@@ -515,7 +515,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getBarcodeSymbology(_ barcodeSymbology: String?) -> SCBBarcodeSymbology {
-        if (barcodeSymbology ?? "").isEmpty {
+        if !(barcodeSymbology ?? "").isEmpty {
             if (barcodeSymbology == "Code128") {
                 return SCBBarcodeSymbology.code128
             } else if (barcodeSymbology == "Code39") {
@@ -542,7 +542,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getBarcodeWidth(_ barcodeWidth: String?) -> SCBBarcodeWidth {
-        if (barcodeWidth ?? "").isEmpty {
+        if !(barcodeWidth ?? "").isEmpty {
             if (barcodeWidth == "Mode1") {
                 return SCBBarcodeWidth.mode1
             } else if (barcodeWidth == "Mode2") {
@@ -569,7 +569,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getQrCodeModel(_ qrCodeModel: String?) -> SCBQrCodeModel {
-        if (qrCodeModel ?? "").isEmpty {
+        if !(qrCodeModel ?? "").isEmpty {
             if (qrCodeModel == "No1") {
                 return SCBQrCodeModel.no1
             } else if (qrCodeModel == "No2") {
@@ -582,7 +582,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         }
     }
     func getQrCodeLevel(_ qrCodeLevel: String?) -> SCBQrCodeLevel {
-        if (qrCodeLevel ?? "").isEmpty {
+        if !(qrCodeLevel ?? "").isEmpty {
             if (qrCodeLevel == "H") {
                 return SCBQrCodeLevel.H
             } else if (qrCodeLevel == "L") {
@@ -600,7 +600,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
     }
     //  Converted to Swift 5.2 by Swiftify v5.2.29688 - https://swiftify.com/
     func getBitmapConverterRotation(_ rotation: String?) -> SCBBitmapConverterRotation {
-        if (rotation ?? "").isEmpty {
+        if !(rotation ?? "").isEmpty {
             if (rotation == "Normal") {
                 return SCBBitmapConverterRotation.normal
             } else if (rotation == "Left90") {
