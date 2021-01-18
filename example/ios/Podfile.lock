@@ -1,11 +1,11 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_star_prnt (0.0.1):
+  - flutter_star_prnt (0.0.2):
     - Flutter
-    - StarIO (= 2.7.0)
-    - StarIO_Extension (= 1.14.0)
-  - StarIO (2.7.0)
-  - StarIO_Extension (1.14.0):
+    - StarIO (= 2.8.2)
+    - StarIO_Extension (= 1.15.0)
+  - StarIO (2.8.2)
+  - StarIO_Extension (1.15.0):
     - StarIO
 
 DEPENDENCIES:
@@ -25,10 +25,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_star_prnt: 5d7830ef112f27736c23f79f5367b6dadbb513f2
-  StarIO: 2d29cff48971173f40191dc9b3e23e5a6863b9da
-  StarIO_Extension: 99eb938cd82cea249f298fe5a35074e9aaedf6d7
+  flutter_star_prnt: 9138edb5890c7f0c8c4a47459a95bb01e67995f1
+  StarIO: e1d416e563e34fd77f94de779913618f6aac8972
+  StarIO_Extension: 0484b9f19869e29f6e875060a543243f14153ba4
 
-PODFILE CHECKSUM: 75848d0b31b16ed12a2aa8ea83d090e6e333b28b
+PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1
