@@ -168,7 +168,7 @@
 				TargetAttributes = {
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = Y6F6QCVDBY;
+						DevelopmentTeam = XXF87Q6A89;
 						LastSwiftMigration = 1100;
 					};
 				};
@@ -503,7 +503,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = Y6F6QCVDBY;
+				DEVELOPMENT_TEAM = XXF87Q6A89;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
