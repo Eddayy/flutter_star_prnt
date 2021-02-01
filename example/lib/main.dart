@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_star_prnt/flutter_star_prnt.dart';
 
@@ -21,8 +22,9 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: FlatButton(
+        body: Column(
+          children: <Widget>[
+            FlatButton(
               onPressed: () async {
                 List<PortInfo> list =
                     await StarPrnt.portDiscovery(StarPortType.All);
@@ -72,7 +74,42 @@ class _MyAppState extends State<MyApp> {
                   }
                 });
               },
-              child: Text('test')),
+              child: Text('Print from text'),
+            ),
+            FlatButton(
+              onPressed: () async {
+                FilePickerResult file = await FilePicker.platform.pickFiles();
+                if (file != null) {
+                  String file_path = file.files.single.path;
+                  List<PortInfo> list =
+                      await StarPrnt.portDiscovery(StarPortType.All);
+                  print(list);
+                  list.forEach((port) async {
+                    print(port.portName);
+                    if (port.portName.isNotEmpty) {
+                      print(await StarPrnt.checkStatus(
+                        portName: port.portName,
+                        emulation: 'StarGraphic',
+                      ));
+
+                      PrintCommands commands = PrintCommands();
+                      Map<String, dynamic> rasterMap = {
+                        'appendBitmapFilePath': file_path
+                      };
+                      commands.push(rasterMap);
+                      print(await StarPrnt.print(
+                          portName: port.portName,
+                          emulation: 'StarGraphic',
+                          printCommands: commands));
+                    }
+                  });
+                } else {
+                  // User canceled the picker
+                }
+              },
+              child: Text('Print from file'),
+            ),
+          ],
         ),
       ),
     );
