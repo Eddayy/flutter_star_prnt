@@ -1,4 +1,0 @@
-framework module StarIO {
-  header "../../Frameworks/StarIO.framework/Headers/SMPortSwift.h"
-  export *
-}

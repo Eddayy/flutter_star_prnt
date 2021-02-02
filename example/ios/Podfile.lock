@@ -1,5 +1,4 @@
 PODS:
-  - BluetoothKit (0.4.0)
   - DKImagePickerController/Core (4.2.2):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
@@ -37,7 +36,6 @@ PODS:
   - FLAnimatedImage (1.0.12)
   - Flutter (1.0.0)
   - flutter_star_prnt (0.0.1):
-    - BluetoothKit (= 0.4)
     - Flutter
   - SDWebImage (5.9.5):
     - SDWebImage/Core (= 5.9.5)
@@ -53,7 +51,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - BluetoothKit
     - DKImagePickerController
     - DKPhotoGallery
     - FLAnimatedImage
@@ -69,13 +66,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_star_prnt/ios"
 
 SPEC CHECKSUMS:
-  BluetoothKit: 00e189e01ba765e2689c46fbd8d0ede62984441b
   DKImagePickerController: 4a3e7948a848c4348e600b3fe5ce41478835fa10
   DKPhotoGallery: 0290d32343574f06eaa4c26f8f2f8a1035e916be
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_star_prnt: d94f2779313fbf9231a02fecf89be4cc068d5a80
+  flutter_star_prnt: 415f33a39ed3a69dcc4d8d9008f3c5cd8021fcdd
   SDWebImage: 0b2ba0d56479bf6a45ecddbfd5558bea93150d25
   SDWebImageFLPlugin: 6c2295fb1242d44467c6c87dc5db6b0a13228fd8
 

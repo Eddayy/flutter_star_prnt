@@ -1,0 +1,5 @@
+module StarIO_Extension {
+  header "Headers/StarIoExt.h"
+  header "Headers/StarIoExtManager.h"
+  export *
+}

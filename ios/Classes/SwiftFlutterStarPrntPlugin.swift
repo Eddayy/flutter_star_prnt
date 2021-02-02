@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-import Star
+import StarIO
 import StarIO_Extension
 
 public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
