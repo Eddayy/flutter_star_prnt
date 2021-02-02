@@ -1,3 +1,7 @@
+## 1.0.7
+
+- Change readme typo
+
 ## 1.0.6
 
 - Add appendBitmap implementation for IOS
