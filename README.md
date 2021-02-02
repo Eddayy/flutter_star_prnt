@@ -1,4 +1,3 @@
-
 # flutter_star_prnt
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_star_prnt)](https://pub.dev/packages/flutter_star_prnt)
@@ -8,6 +7,14 @@ Flutter plugin for [Star micronics printers](http://www.starmicronics.com/pages/
 Native code based on React Native and Ionic/Cordova version  
 React native Version ➜ [here](https://github.com/infoxicator/react-native-star-prnt)  
 Ionic/Cordova Version ➜ [here](https://github.com/auctifera-josed/starprnt)
+
+## Updating from >=1.0.4
+
+If you're having trouble please run these commands
+
+```bash
+rm -rf ios/Pods && rm ios/Podfile.lock && flutter clean
+```
 
 ## Getting Started
 
