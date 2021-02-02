@@ -15,11 +15,10 @@ class PrintCommands {
   appendCutPaper(StarCutPaperAction action) {
     this._commands.add({"appendCutPaper": action.text});
   }
-  
-    openCashDrawer(int actionNumber) { 
+
+  openCashDrawer(int actionNumber) {
     this._commands.add({"openCashDrawer": actionNumber});
   }
-
 
   appendBitmapText({
     @required String text,

@@ -1,3 +1,7 @@
+## 1.0.6
+
+- Add appendBitmap implementation for IOS
+
 ## 1.0.5
 
 - This plugin now supports use_framework!

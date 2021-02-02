@@ -78,36 +78,32 @@ class _MyAppState extends State<MyApp> {
             ),
             FlatButton(
               onPressed: () async {
-                FilePickerResult file = await FilePicker.platform.pickFiles();
-                if (file != null) {
-                  String file_path = file.files.single.path;
-                  List<PortInfo> list =
-                      await StarPrnt.portDiscovery(StarPortType.All);
-                  print(list);
-                  list.forEach((port) async {
-                    print(port.portName);
-                    if (port.portName.isNotEmpty) {
-                      print(await StarPrnt.checkStatus(
+                //FilePickerResult file = await FilePicker.platform.pickFiles();
+                List<PortInfo> list =
+                    await StarPrnt.portDiscovery(StarPortType.All);
+                print(list);
+                list.forEach((port) async {
+                  print(port.portName);
+                  if (port.portName.isNotEmpty) {
+                    print(await StarPrnt.checkStatus(
+                      portName: port.portName,
+                      emulation: 'StarGraphic',
+                    ));
+
+                    PrintCommands commands = PrintCommands();
+                    Map<String, dynamic> rasterMap = {
+                      'appendBitmap':
+                          'https://c8.alamy.com/comp/MPCNP1/camera-logo-design-photograph-logo-vector-icons-MPCNP1.jpg'
+                    };
+                    commands.push(rasterMap);
+                    print(await StarPrnt.print(
                         portName: port.portName,
                         emulation: 'StarGraphic',
-                      ));
-
-                      PrintCommands commands = PrintCommands();
-                      Map<String, dynamic> rasterMap = {
-                        'appendBitmapFilePath': file_path
-                      };
-                      commands.push(rasterMap);
-                      print(await StarPrnt.print(
-                          portName: port.portName,
-                          emulation: 'StarGraphic',
-                          printCommands: commands));
-                    }
-                  });
-                } else {
-                  // User canceled the picker
-                }
+                        printCommands: commands));
+                  }
+                });
               },
-              child: Text('Print from file'),
+              child: Text('Print from url'),
             ),
           ],
         ),

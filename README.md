@@ -2,7 +2,7 @@
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_star_prnt)](https://pub.dev/packages/flutter_star_prnt)
 
-Flutter plugin for [Star micronics printers](http://www.starmicronics.com/pages/All-Products).
+Flutter plugin for [Star micronics printers](https://www.starmicronics.com/pages/All-Products).
 
 Native code based on React Native and Ionic/Cordova version  
 React native Version ➜ [here](https://github.com/infoxicator/react-native-star-prnt)  

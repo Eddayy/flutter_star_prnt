@@ -254,7 +254,40 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                     builder.appendQrCodeData((command["appendQrCode"] as! String).data(using: encoding), model: qrCodeModel, level: qrCodeLevel, cell: cell)
                 }
             } else if (command["appendBitmap"] != nil) {
+                let urlString = command["appendBitmap"] as? String
+                let width = command["width"] != nil ? (command["width"] as? NSNumber)?.intValue ?? 0 : 576
+                let diffusion = ((command["diffusion"] as? NSNumber)?.boolValue ?? false == false) ? false : true
+                let bothScale = ((command["bothScale"] as? NSNumber)?.boolValue ?? false == false) ? false : true
+                let rotation = getBitmapConverterRotation(command["rotation"] as? String)
+                let error: Error? = nil
+                let imageURL = URL(string: urlString ?? "")
+                var imageData: Data? = nil
+                do {
+                    if let imageURL = imageURL {
+                        imageData = try Data(contentsOf: imageURL, options: .uncached)
+                    }
+                } catch {
+                }
 
+                if error != nil {
+                    let fileImageURL = URL(fileURLWithPath: urlString ?? "")
+                    do {
+                        imageData = try Data(contentsOf: fileImageURL)
+                    } catch {
+                    }
+                }
+                if imageData != nil {
+                    let image = UIImage(data: imageData!)
+                    if command["absolutePosition"] != nil {
+                        let position = ((command["absolutePosition"] as? NSNumber)?.intValue ?? 0) != 0 ? (command["absolutePosition"] as? NSNumber)?.intValue ?? 0 : 40
+                        builder.appendBitmap(withAbsolutePosition: image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation, position: position)
+                    } else if command["alignment"] != nil {
+                        let alignment = getAlignment(command["alignment"] as?  String)
+                        builder.appendBitmap(withAlignment: image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation, position: alignment)
+                    } else {
+                        builder.appendBitmap(image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation)
+                    }
+                }
             } else if (command["appendBitmapText"] != nil) {
                 let text:String = command["appendBitmapText"] as! String
                 let width = command["width"] != nil ? command["width"] as! Int : 576
