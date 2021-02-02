@@ -1,0 +1,5 @@
+framework module StarIO_Extension {
+  header "../../Frameworks/StarIO_Extension.framework/Headers/StarIoExt.h"
+  header "../../Frameworks/StarIO_Extension.framework/Headers/StarIoExtManager.h"
+  export *
+}

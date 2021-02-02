@@ -20,13 +20,15 @@ Pod::Spec.new do |s|
   s.platform = :ios, '8.0'
   s.preserve_path = 'Classes/**/*.modulemap'
   s.preserve_paths = 'Frameworks/*.framework'
-  s.public_header_files = 'Frameworks/*.framework/**/*.h'
+  s.dependency 'BluetoothKit' ,'0.4' 
+  #s.public_header_files = 'Frameworks/*.framework/**/*.h'
   s.vendored_frameworks = 'Frameworks/*.framework'
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 
     'DEFINES_MODULE' => 'YES', 
-    'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' ,
-    'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Classes/**/ $(PODS_TARGET_SRCROOT)/Classes'
+    'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Classes/**/',
+    'LIBRARY_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/Frameworks/**/'
   }
+  s.xcconfig = { "OTHER_LDFLAGS" => '$(inherited) -framework "CoreBluetooth"' }
   s.swift_version = '5.0'
 end
