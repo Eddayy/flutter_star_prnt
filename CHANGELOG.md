@@ -1,3 +1,7 @@
+## 1.0.8
+
+- Fix IOS appendbitmap not working for filepaths
+
 ## 1.0.7
 
 - Change readme typo
