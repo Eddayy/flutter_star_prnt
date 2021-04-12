@@ -268,8 +268,8 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
             } else if (command["appendBitmap"] != nil) {
                 let urlString = command["appendBitmap"] as? String
                 let width = command["width"] != nil ? (command["width"] as? NSNumber)?.intValue ?? 0 : 576
-                let diffusion = ((command["diffusion"] as? NSNumber)?.boolValue ?? false == false) ? false : true
-                let bothScale = ((command["bothScale"] as? NSNumber)?.boolValue ?? false == false) ? false : true
+                let bothScale = command["bothScale"] != nil ? command["bothScale"] as! Bool : true
+                let diffusion = command["diffusion"] != nil ? command["diffusion"] as! Bool : true
                 let rotation = getBitmapConverterRotation(command["rotation"] as? String)
                 let error: Error? = nil
                 let imageURL = URL(string: urlString ?? "")
