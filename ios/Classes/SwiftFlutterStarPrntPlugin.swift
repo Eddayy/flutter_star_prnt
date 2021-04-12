@@ -30,19 +30,31 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         let type = arguments["type"] as! String
         do {
             var info = [Dictionary<String,String>]()
-            if ( type == "Bluetooth" || type == "All") {
+            if (type == "All") {
+                let btPortInfoArray = try SMPort.searchPrinter(target: "All:")
+                for printer in btPortInfoArray {
+                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
+                }
+            }
+            if ( type == "Bluetooth" ) {
                 let btPortInfoArray = try SMPort.searchPrinter(target: "BT:")
                 for printer in btPortInfoArray {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
                 }
             }
-            if ( type == "LAN" || type == "All") {
+            if ( type == "BluetoothLE" ) {
+                let btPortInfoArray = try SMPort.searchPrinter(target: "BTLE:")
+                for printer in btPortInfoArray {
+                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
+                }
+            }
+            if ( type == "LAN" ) {
                 let lanPortInfoArray = try SMPort.searchPrinter(target: "TCP:")
                 for printer in lanPortInfoArray {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
                 }
             }
-            if ( type == "USB" || type == "All") {
+            if ( type == "USB" ) {
                 let usbPortInfoArray = try SMPort.searchPrinter(target: "USB:")
                 for printer in usbPortInfoArray {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
@@ -267,9 +279,6 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                         imageData = try Data(contentsOf: imageURL, options: .uncached)
                     }
                 } catch {
-                }
-
-                if error != nil {
                     let fileImageURL = URL(fileURLWithPath: urlString ?? "")
                     do {
                         imageData = try Data(contentsOf: fileImageURL)
