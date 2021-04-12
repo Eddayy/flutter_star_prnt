@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.graphics.BitmapFactory 
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -15,6 +16,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.Log
+import android.webkit.URLUtil
 import androidx.annotation.NonNull
 import com.starmicronics.stario.PortInfo
 import com.starmicronics.stario.StarIOPort
@@ -58,7 +60,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         val channel = MethodChannel(messenger, "flutter_star_prnt")
         channel.setMethodCallHandler(FlutterStarPrntPlugin())
       } catch (e: Exception) {
-          Log.e("FlutterSecureStoragePl", "Registration failed", e)
+          Log.e("FlutterStarPrnt", "Registration failed", e)
       }
     }
   }
@@ -356,14 +358,23 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         val bothScale: Boolean = if (it.containsKey("bothScale")) (it.get("bothScale").toString()).toBoolean() else true
         val rotation: ICommandBuilder.BitmapConverterRotation = if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString()) else getConverterRotation("Normal")
         try {
-            val imageUri: Uri = Uri.parse(it.get("appendBitmap").toString())
-            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri)
-            if (it.containsKey("absolutePosition")) {
+            var bitmap: Bitmap? = null
+            if (URLUtil.isValidUrl(it.get("appendBitmap").toString())) {
+              val imageUri: Uri = Uri.parse(it.get("appendBitmap").toString())
+              bitmap  = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri)
+            } else {
+              bitmap = BitmapFactory.decodeFile(it.get("appendBitmap").toString())
+            }
+
+            if (bitmap != null) {
+              if (it.containsKey("absolutePosition")) {
                 builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, (it.get("absolutePosition").toString()).toInt())
-            } else if (it.containsKey("alignment")) {
-                builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, getAlignment(it.get("alignment").toString()))
-            } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
-        } catch (e: IOException) {
+              } else if (it.containsKey("alignment")) {
+                  builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, getAlignment(it.get("alignment").toString()))
+              } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
+            }
+        } catch (e: Exception) {
+          Log.e("FlutterStarPrnt", "appendbitmap failed", e)
         }
       } else if (it.containsKey("appendBitmapText")) {
         val fontSize: Float = if (it.containsKey("fontSize")) (it.get("fontSize").toString()).toFloat() else 25.toFloat()

@@ -1,3 +1,7 @@
+## 1.0.9
+
+- Add Android appendbitmap to accept file path string
+
 ## 1.0.8
 
 - Fix IOS appendbitmap not working for filepaths
