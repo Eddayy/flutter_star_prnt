@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_star_prnt/enums.dart';
 
 class PrintCommands {
@@ -21,21 +20,22 @@ class PrintCommands {
   }
 
   appendBitmapText({
-    @required String text,
-    int fontSize,
+    required String text,
+    int? fontSize,
     bool diffusion = true,
-    int width,
+    int? width,
     bool bothScale = true,
-    int absolutePosition,
-    StarAlignmentPosition alignment,
-    StarBitmapConverterRotation rotation,
+    int? absolutePosition,
+    StarAlignmentPosition? alignment,
+    StarBitmapConverterRotation? rotation,
   }) {
     Map<String, dynamic> command = {
       "appendBitmapText": text,
     };
+    command['bothScale'] = bothScale;
+    command['diffusion'] = diffusion;
     if (fontSize != null) command['fontSize'] = fontSize;
     if (width != null) command['width'] = fontSize;
-    if (bothScale != null) command['bothScale'] = bothScale;
     if (absolutePosition != null)
       command['absolutePosition'] = absolutePosition;
     if (alignment != null) command['alignment'] = alignment.text;

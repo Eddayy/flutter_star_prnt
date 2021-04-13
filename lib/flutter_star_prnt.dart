@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_star_prnt/enums.dart';
 import 'package:flutter_star_prnt/portInfo.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_star_prnt/print_commands.dart';
 
 export 'enums.dart';
@@ -20,13 +19,13 @@ class StarPrnt {
         return PortInfo(port);
       }).toList();
     } else {
-      return null;
+      return [];
     }
   }
 
   static Future<dynamic> checkStatus({
-    @required String portName,
-    @required String emulation,
+    required String portName,
+    required String emulation,
   }) async {
     dynamic result = await _channel.invokeMethod('checkStatus', {
       'portName': portName,
@@ -35,10 +34,11 @@ class StarPrnt {
     return result;
   }
 
-  static Future<dynamic> print(
-      {@required String portName,
-      @required String emulation,
-      @required PrintCommands printCommands}) async {
+  static Future<dynamic> print({
+    required String portName,
+    required String emulation,
+    required PrintCommands printCommands,
+  }) async {
     dynamic result = await _channel.invokeMethod('print', {
       'portName': portName,
       'emulation': emulation,
@@ -48,8 +48,8 @@ class StarPrnt {
   }
 
   static Future<dynamic> connect({
-    @required String portName,
-    @required String emulation,
+    required String portName,
+    required String emulation,
     bool hasBarcodeReader = false,
   }) async {
     dynamic result = await _channel.invokeMethod('connect', {

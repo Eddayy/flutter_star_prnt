@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_star_prnt/flutter_star_prnt.dart';
 
@@ -24,7 +23,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Column(
           children: <Widget>[
-            FlatButton(
+            TextButton(
               onPressed: () async {
                 List<PortInfo> list =
                     await StarPrnt.portDiscovery(StarPortType.All);
@@ -76,7 +75,7 @@ class _MyAppState extends State<MyApp> {
               },
               child: Text('Print from text'),
             ),
-            FlatButton(
+            TextButton(
               onPressed: () async {
                 //FilePickerResult file = await FilePicker.platform.pickFiles();
                 List<PortInfo> list =

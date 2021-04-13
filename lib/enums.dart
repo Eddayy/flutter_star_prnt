@@ -41,7 +41,7 @@ enum StarEncoding {
 }
 
 extension ExtendedEncoding on StarEncoding {
-  String get text => const {
+  String? get text => const {
         StarEncoding.USASCII: "US-ASCII",
         StarEncoding.Windows1252: "Windows-1252",
         StarEncoding.ShiftJIS: "Shift-JIS",

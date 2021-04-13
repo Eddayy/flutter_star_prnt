@@ -1,8 +1,8 @@
 class PortInfo {
-  String macAddress;
-  String modelName;
-  String portName;
-  String usbSerialNumber;
+  String? macAddress;
+  String? modelName;
+  String? portName;
+  String? usbSerialNumber;
 
   PortInfo(dynamic port) {
     if (port.containsKey('macAddress')) this.macAddress = port['macAddress'];
