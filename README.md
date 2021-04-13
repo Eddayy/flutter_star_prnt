@@ -49,6 +49,17 @@ Permissions required depending on your printer:
 <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
 ```
 
+## Ios
+
+Need to add this into your info.plist for bluetooth printers
+
+```xml
+<key>UISupportedExternalAccessoryProtocols</key>
+  <array>
+    <string>jp.star-m.starpro</string>
+  </array>
+```
+
 ## Work in progress
 
 - [ ] Connect/disconnect function for persistent connection

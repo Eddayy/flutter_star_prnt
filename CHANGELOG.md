@@ -1,3 +1,7 @@
+## 1.0.11
+
+- Fix ios having issue scanning for bluetooth printers
+
 ## 1.0.10
 
 - Fix ios appendbitmap scale and difussion settings

@@ -24,6 +24,6 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = { 
     'DEFINES_MODULE' => 'NO', 
   }
-  s.xcconfig = { "OTHER_LDFLAGS" => '$(inherited) -framework "CoreBluetooth" -framework "StarIO" -framework "StarIO_Extension"' }
+  s.xcconfig = { "OTHER_LDFLAGS" => '$(inherited) -framework "ExternalAccessory" -framework "CoreBluetooth" -framework "StarIO" -framework "StarIO_Extension"' }
   s.swift_version = '5.0'
 end
