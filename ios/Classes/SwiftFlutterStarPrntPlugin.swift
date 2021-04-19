@@ -265,7 +265,22 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                 } else {
                     builder.appendQrCodeData((command["appendQrCode"] as! String).data(using: encoding), model: qrCodeModel, level: qrCodeLevel, cell: cell)
                 }
-            } else if (command["appendBitmap"] != nil) {
+            }else if let imageData = (command["appendBitmapImg"] as? FlutterStandardTypedData)?.data {
+                let width = (command["width"] as? NSNumber)?.intValue ??  576
+                let diffusion = (command["diffusion"] as? NSNumber)?.boolValue ?? false
+                let bothScale = (command["bothScale"] as? NSNumber)?.boolValue ?? false
+                let rotation = getBitmapConverterRotation(command["rotation"] as? String)
+                let image = UIImage(data: imageData)
+                if command["absolutePosition"] != nil {
+                    let position = ((command["absolutePosition"] as? NSNumber)?.intValue ?? 0) != 0 ? (command["absolutePosition"] as? NSNumber)?.intValue ?? 0 : 40
+                    builder.appendBitmap(withAbsolutePosition: image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation, position: position)
+                } else if command["alignment"] != nil {
+                    let alignment = getAlignment(command["alignment"] as?  String)
+                    builder.appendBitmap(withAlignment: image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation, position: alignment)
+                } else {
+                    builder.appendBitmap(image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation)
+                }
+            }else if (command["appendBitmap"] != nil) {
                 let urlString = command["appendBitmap"] as? String
                 let width = command["width"] != nil ? (command["width"] as? NSNumber)?.intValue ?? 0 : 576
                 let bothScale = command["bothScale"] != nil ? command["bothScale"] as! Bool : true
