@@ -390,7 +390,24 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         } else if (it.containsKey("alignment")) {
             builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, getAlignment(it.get("alignment").toString()))
         } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
-      }
+      } else if (it.containsKey("appendBitmapByteArray")) {
+        val diffusion: Boolean = if (it.containsKey("diffusion")) (it.get("diffusion").toString()).toBoolean() else true
+        val width: Int = if (it.containsKey("width")) (it.get("width").toString()).toInt() else 576
+        val bothScale: Boolean = if (it.containsKey("bothScale")) (it.get("bothScale").toString()).toBoolean() else true
+        val rotation: ICommandBuilder.BitmapConverterRotation = if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString()) else getConverterRotation("Normal")
+        try {
+            var bitmap: Bitmap? = null
+            bitmap = BitmapFactory.decodeByteArray(it.get("appendBitmapByteArray"), 0, image.size)
+            if (bitmap != null) {
+              if (it.containsKey("absolutePosition")) {
+                builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, (it.get("absolutePosition").toString()).toInt())
+              } else if (it.containsKey("alignment")) {
+                  builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, getAlignment(it.get("alignment").toString()))
+              } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
+            }
+        } catch (e: Exception) {
+          Log.e("FlutterStarPrnt", "appendbitmapbyteArray failed", e)
+        }}
     }
   }
 
