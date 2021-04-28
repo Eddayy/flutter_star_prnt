@@ -300,8 +300,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
             } else if (command["appendBitmapText"] != nil) {
                 let text:String = command["appendBitmapText"] as! String
                 let width = command["width"] != nil ? command["width"] as! Int : 576
-                let fontName = command["font"] != nil ? command["font"] as! String : "
-                5867"
+                let fontName = command["font"] != nil ? command["font"] as! String : "Menlo"
                 let fontSize = command["fontSize"] != nil ? command["fontSize"] as! Int : 12
                 let bothScale = command["bothScale"] != nil ? command["bothScale"] as! Bool : true
                 let rotation = SCBBitmapConverterRotation.normal;

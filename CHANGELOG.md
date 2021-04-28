@@ -1,3 +1,9 @@
+## 2.1.0
+
+- Android/IOS added appendBitmapByteArray
+- Added appendBitmapByte function for print commands
+- Added createimagefromwidget function for print commands
+
 ## 2.0.0
 
 - Update to support null-safety

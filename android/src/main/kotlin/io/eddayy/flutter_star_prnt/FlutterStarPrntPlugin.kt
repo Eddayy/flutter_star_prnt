@@ -396,8 +396,9 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         val bothScale: Boolean = if (it.containsKey("bothScale")) (it.get("bothScale").toString()).toBoolean() else true
         val rotation: ICommandBuilder.BitmapConverterRotation = if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString()) else getConverterRotation("Normal")
         try {
+            val byteArray: ByteArray = it.get("appendBitmapByteArray") as ByteArray
             var bitmap: Bitmap? = null
-            bitmap = BitmapFactory.decodeByteArray(it.get("appendBitmapByteArray"), 0, image.size)
+            bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
             if (bitmap != null) {
               if (it.containsKey("absolutePosition")) {
                 builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, (it.get("absolutePosition").toString()).toInt())
