@@ -1,3 +1,8 @@
+## 2.2.0
+
+- Added appendBitmapWidget function for print commands
+- Added comment documentations of the print commands
+
 ## 2.1.0
 
 - Android/IOS added appendBitmapByteArray
