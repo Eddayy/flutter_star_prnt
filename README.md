@@ -62,7 +62,6 @@ Need to add this into your info.plist for bluetooth printers
 
 ## Work in progress
 
-- [ ] Connect/disconnect function for persistent connection
-- [ ] Helper function on appending print commands
+- [ ] Added documentations in readme
 
 ## Documentation work in progress, please refer to react native or Ionic/Cordova's documentations for command format
