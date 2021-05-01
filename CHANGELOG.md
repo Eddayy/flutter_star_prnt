@@ -1,3 +1,7 @@
+## 2.2.1
+
+- Fix android port not released after used
+
 ## 2.2.0
 
 - Added appendBitmapWidget function for print commands

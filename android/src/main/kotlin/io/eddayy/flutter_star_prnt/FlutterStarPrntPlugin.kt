@@ -626,6 +626,13 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         result.success("Success")
       } catch (e: Exception) {
         result.error("STARIO_PORT_EXCEPTION", e.message, null)
+      } finally {
+        if (port != null) {
+          try {
+            StarIOPort.releasePort(port)
+          } catch (e: Exception) {
+          }
+        }
       }
     }
 }
