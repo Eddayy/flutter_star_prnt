@@ -27,7 +27,31 @@ class StarPrnt {
     }
   }
 
-  static Future<PrinterResponseStatus> checkStatus({
+  static Future<dynamic> checkStatus({
+    required String portName,
+    required String emulation,
+  }) async {
+    dynamic result = await _channel.invokeMethod('checkStatus', {
+      'portName': portName,
+      'emulation': emulation,
+    });
+    return result;
+  }
+
+  static Future<dynamic> print({
+    required String portName,
+    required String emulation,
+    required PrintCommands printCommands,
+  }) async {
+    dynamic result = await _channel.invokeMethod('print', {
+      'portName': portName,
+      'emulation': emulation,
+      'printCommands': printCommands.getCommands(),
+    });
+    return result;
+  }
+
+  static Future<PrinterResponseStatus> checkStatusReturnObj({
     required String portName,
     required String emulation,
   }) async {
@@ -40,7 +64,7 @@ class StarPrnt {
     );
   }
 
-  static Future<PrinterResponseStatus> print({
+  static Future<PrinterResponseStatus> printReturnObj({
     required String portName,
     required String emulation,
     required PrintCommands printCommands,
