@@ -4,9 +4,13 @@ import 'package:flutter_star_prnt/enums.dart';
 import 'package:flutter_star_prnt/portInfo.dart';
 import 'package:flutter_star_prnt/print_commands.dart';
 
+import 'printer_response_status.dart';
+
 export 'enums.dart';
 export 'portInfo.dart';
 export 'print_commands.dart';
+export 'ultilities.dart';
+export 'printer_response_status.dart';
 
 class StarPrnt {
   static const MethodChannel _channel =
@@ -23,7 +27,7 @@ class StarPrnt {
     }
   }
 
-  static Future<dynamic> checkStatus({
+  static Future<PrinterResponseStatus> checkStatus({
     required String portName,
     required String emulation,
   }) async {
@@ -31,10 +35,12 @@ class StarPrnt {
       'portName': portName,
       'emulation': emulation,
     });
-    return result;
+    return PrinterResponseStatus.fromMap(
+      Map<String, dynamic>.from(result),
+    );
   }
 
-  static Future<dynamic> print({
+  static Future<PrinterResponseStatus> print({
     required String portName,
     required String emulation,
     required PrintCommands printCommands,
@@ -44,7 +50,9 @@ class StarPrnt {
       'emulation': emulation,
       'printCommands': printCommands.getCommands(),
     });
-    return result;
+    return PrinterResponseStatus.fromMap(
+      Map<String, dynamic>.from(result),
+    );
   }
 
   static Future<dynamic> connect({

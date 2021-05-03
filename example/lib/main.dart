@@ -36,6 +36,15 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  String emulationFor(String modelName) {
+    String emulation = 'StarGraphic';
+    if (modelName != null && modelName != '') {
+      final em = StarMicronicsUltilities.detectEmulation(modelName: modelName);
+      emulation = em?.emulation;
+    }
+    return emulation;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -53,7 +62,7 @@ class _MyAppState extends State<MyApp> {
                   if (port.portName.isNotEmpty) {
                     print(await StarPrnt.checkStatus(
                       portName: port.portName,
-                      emulation: 'StarGraphic',
+                      emulation: emulationFor(port.modelName),
                     ));
 
                     PrintCommands commands = PrintCommands();
@@ -88,7 +97,7 @@ class _MyAppState extends State<MyApp> {
                     commands.push(rasterMap);
                     print(await StarPrnt.print(
                         portName: port.portName,
-                        emulation: 'StarGraphic',
+                        emulation: emulationFor(port.modelName),
                         printCommands: commands));
                   }
                 });
@@ -106,7 +115,7 @@ class _MyAppState extends State<MyApp> {
                   if (port.portName.isNotEmpty) {
                     print(await StarPrnt.checkStatus(
                       portName: port.portName,
-                      emulation: 'StarGraphic',
+                      emulation: emulationFor(port.modelName),
                     ));
 
                     PrintCommands commands = PrintCommands();
@@ -117,7 +126,7 @@ class _MyAppState extends State<MyApp> {
                     commands.push(rasterMap);
                     print(await StarPrnt.print(
                         portName: port.portName,
-                        emulation: 'StarGraphic',
+                        emulation: emulationFor(port.modelName),
                         printCommands: commands));
                   }
                 });
@@ -156,7 +165,7 @@ class _MyAppState extends State<MyApp> {
                   if (port.portName.isNotEmpty) {
                     print(await StarPrnt.checkStatus(
                       portName: port.portName,
-                      emulation: 'StarGraphic',
+                      emulation: emulationFor(port.modelName),
                     ));
 
                     PrintCommands commands = PrintCommands();
@@ -169,7 +178,7 @@ class _MyAppState extends State<MyApp> {
                         .push({'alignment': StarAlignmentPosition.Left.text});
                     print(await StarPrnt.print(
                         portName: port.portName,
-                        emulation: 'StarGraphic',
+                        emulation: emulationFor(port.modelName),
                         printCommands: commands));
                   }
                 });

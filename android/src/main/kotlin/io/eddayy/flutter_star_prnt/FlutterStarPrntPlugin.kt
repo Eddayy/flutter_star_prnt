@@ -10,14 +10,12 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.Log
-import android.webkit.URLUtil
 import androidx.annotation.NonNull
 import com.starmicronics.stario.PortInfo
 import com.starmicronics.stario.StarIOPort
 import com.starmicronics.stario.StarPrinterStatus
 import com.starmicronics.starioextension.ICommandBuilder
-import com.starmicronics.starioextension.ICommandBuilder.CodePageType
-import com.starmicronics.starioextension.ICommandBuilder.CutPaperAction
+import com.starmicronics.starioextension.ICommandBuilder.*
 import com.starmicronics.starioextension.IConnectionCallback
 import com.starmicronics.starioextension.StarIoExt
 import com.starmicronics.starioextension.StarIoExt.Emulation
@@ -29,10 +27,9 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
-import kotlin.collections.ArrayList
-import kotlin.collections.MutableMap
 
 /** FlutterStarPrntPlugin */
 public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
@@ -53,20 +50,14 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         val channel = MethodChannel(messenger, "flutter_star_prnt")
         channel.setMethodCallHandler(FlutterStarPrntPlugin())
       } catch (e: Exception) {
-        Log.e("FlutterStarPrnt", "Registration failed", e)
+          Log.e("FlutterStarPrnt", "Registration failed", e)
       }
     }
   }
-  override fun onAttachedToEngine(
-      @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
-  ) {
-    val channel =
-        MethodChannel(
-            flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_star_prnt")
+  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_star_prnt")
     channel.setMethodCallHandler(FlutterStarPrntPlugin())
-    setupPlugin(
-        flutterPluginBinding.getFlutterEngine().getDartExecutor(),
-        flutterPluginBinding.getApplicationContext())
+    setupPlugin(flutterPluginBinding.getFlutterEngine().getDartExecutor(), flutterPluginBinding.getApplicationContext())
   }
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull rawResult: Result) {
     val result: MethodResultWrapper = MethodResultWrapper(rawResult)
@@ -99,30 +90,27 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     public override fun success(result: Any?) {
-      handler.post(
-          object : Runnable {
-            override fun run() {
-              methodResult.success(result)
-            }
-          })
+        handler.post(object : Runnable {
+          override fun run() {
+            methodResult.success(result)
+          }
+        })
     }
 
     public override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-      handler.post(
-          object : Runnable {
-            override fun run() {
-              methodResult.error(errorCode, errorMessage, errorDetails)
-            }
-          })
+        handler.post(object : Runnable {
+          override fun run() {
+            methodResult.error(errorCode, errorMessage, errorDetails)
+          }
+        })
     }
 
     public override fun notImplemented() {
-      handler.post(
-          object : Runnable {
-            override fun run() {
-              methodResult.notImplemented()
-            }
-          })
+        handler.post(object : Runnable {
+          override fun run() {
+            methodResult.notImplemented()
+          }
+        })
     }
   }
   public fun portDiscovery(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -160,17 +148,19 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
 
       val status: StarPrinterStatus = port.retreiveStatus()
 
-      val json: MutableMap<String, Any?> = mutableMapOf()
 
+      val json: MutableMap<String, Any?> = mutableMapOf()
+      json["is_success"] = true
       json["offline"] = status.offline
       json["coverOpen"] = status.coverOpen
+      json["overTemp"] = status.overTemp
       json["cutterError"] = status.cutterError
       json["receiptPaperEmpty"] = status.receiptPaperEmpty
       try {
         val firmwareInformationMap: Map<String, String> = port.firmwareInformation
         json["ModelName"] = firmwareInformationMap["ModelName"]
         json["FirmwareVersion"] = firmwareInformationMap["FirmwareVersion"]
-      } catch (e: Exception) {
+      }catch (e: Exception) {
         json["error_message"] = e.message
       }
       result.success(json)
@@ -179,7 +169,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     } finally {
       if (port != null) {
         try {
-          StarIOPort.releasePort(port)
+         StarIOPort.releasePort(port)
         } catch (e: Exception) {
           result.error("CHECK_STATUS_ERROR", e.message, null)
         }
@@ -196,14 +186,15 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     try {
       var starIoExtManager = this.starIoExtManager
 
-      if (starIoExtManager != null && starIoExtManager.getPort() != null) {
-        starIoExtManager.disconnect(
-            object : IConnectionCallback {
-              public override fun onConnected(connectResult: IConnectionCallback.ConnectResult) {}
-              public override fun onDisconnected() {
-                // Do nothing
-              }
-            })
+      if (starIoExtManager?.port != null) {
+        starIoExtManager.disconnect(object : IConnectionCallback {
+          public override fun onConnected(connectResult: IConnectionCallback.ConnectResult) {
+          }
+
+          public override fun onDisconnected() {
+            // Do nothing
+          }
+        })
       }
 
       starIoExtManager =
@@ -222,7 +213,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
 
                 public override fun onConnected(connectResult: IConnectionCallback.ConnectResult) {
                   if (connectResult == IConnectionCallback.ConnectResult.Success ||
-                      connectResult == IConnectionCallback.ConnectResult.AlreadyConnected) {
+                          connectResult == IConnectionCallback.ConnectResult.AlreadyConnected) {
                     result.success("Printer Connected")
                   } else {
                     result.error("CONNECT_ERROR", "Error Connecting to the printer", null)
@@ -242,7 +233,18 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     val emulation: String = call.argument<String>("emulation") as String
     val printCommands: ArrayList<Map<String, Any>> =
         call.argument<ArrayList<Map<String, Any>>>("printCommands") as ArrayList<Map<String, Any>>
+    if (printCommands.size < 1) {
+      val json: MutableMap<String, Any?> = mutableMapOf()
 
+      json["offline"] = false
+      json["coverOpen"] = false
+      json["cutterError"] = false
+      json["receiptPaperEmpty"] = false
+      json["info_message"] = "No dat to print"
+      json["is_success"] = true
+      result.success(json)
+      return
+    }
     val builder: ICommandBuilder = StarIoExt.createCommandBuilder(getEmulation(emulation))
     builder.beginDocument()
     appendCommands(builder, printCommands, applicationContext)
@@ -450,15 +452,8 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
             if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString())
             else getConverterRotation("Normal")
         try {
-          var bitmap: Bitmap? = null
-          if (URLUtil.isValidUrl(it.get("appendBitmap").toString())) {
             val imageUri: Uri = Uri.parse(it.get("appendBitmap").toString())
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri)
-          } else {
-            bitmap = BitmapFactory.decodeFile(it.get("appendBitmap").toString())
-          }
-
-          if (bitmap != null) {
+            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri)
             if (it.containsKey("absolutePosition")) {
               builder.appendBitmapWithAbsolutePosition(
                   bitmap,
@@ -476,7 +471,6 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
                   rotation,
                   getAlignment(it.get("alignment").toString()))
             } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
-          }
         } catch (e: Exception) {
           Log.e("FlutterStarPrnt", "appendbitmap failed", e)
         }
@@ -760,14 +754,16 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       @NonNull result: Result
   ) {
     var port: StarIOPort? = null
+    var errorPosSting = ""
     try {
       port = StarIOPort.getPort(portName, portSettings, 10000, applicationContext)
+      errorPosSting += "Port Opened,"
       try {
         Thread.sleep(100)
       } catch (e: InterruptedException) {}
       var status: StarPrinterStatus = port.beginCheckedBlock()
       val json: MutableMap<String, Any?> = mutableMapOf()
-
+      errorPosSting += "got status for begin Check,"
       json["offline"] = status.offline
       json["coverOpen"] = status.coverOpen
       json["cutterError"] = status.cutterError
@@ -791,10 +787,17 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         json["error_message"] = "Paper near empty"
       }
       if (isSucess) {
+        errorPosSting += "Writing to port,"
         port.writePort(commands, 0, commands.size)
-        port.setEndCheckedBlockTimeoutMillis(
-            30000); // Change the timeout time of endCheckedBlock method.
-        status = port.endCheckedBlock()
+        errorPosSting += "setting delay End check bock,"
+        port.setEndCheckedBlockTimeoutMillis(30000); // Change the timeout time of endCheckedBlock method.
+        errorPosSting += "doing End check bock,"
+        try {
+          status = port.endCheckedBlock()
+        }catch (e:Exception){
+          errorPosSting += "End check bock exeption ${e.toString()},"
+        }
+
         json["offline"] = status.offline
         json["coverOpen"] = status.coverOpen
         json["cutterError"] = status.cutterError
@@ -816,13 +819,14 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       json["is_success"] = isSucess
       result.success(json)
     } catch (e: Exception) {
-      result.error("STARIO_PORT_EXCEPTION", e.message, null)
+      result.error("STARIO_PORT_EXCEPTION", e.message + " Failed After $errorPosSting", null)
     } finally {
       if (port != null) {
         try {
           StarIOPort.releasePort(port)
         } catch (e: Exception) {
-          result.error("PRINT_ERROR", e.message, null)
+          // not calling error becouse error or status is already called from try or catch.. ignoring this exception now
+//            result.error("PRINT_ERROR", e.message, null)
         }
       }
     }
