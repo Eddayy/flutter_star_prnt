@@ -9,7 +9,7 @@ import 'printer_response_status.dart';
 export 'enums.dart';
 export 'portInfo.dart';
 export 'print_commands.dart';
-export 'ultilities.dart';
+export 'utilities.dart';
 export 'printer_response_status.dart';
 
 class StarPrnt {
