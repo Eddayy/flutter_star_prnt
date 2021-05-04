@@ -83,7 +83,7 @@ final List<StarMicronicsModel> starMicronicsModels = [
       name: 'SM-L300', emulation: 'StarPRNTL', models: ["SM-L300"]),
 ];
 
-class StarMicronicsUltilities {
+class StarMicronicsUtilities {
   static StarMicronicsModel detectEmulation({String? modelName}) {
     final defaultModel = StarMicronicsModel(
         name: 'TSP100',

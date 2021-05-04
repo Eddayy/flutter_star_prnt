@@ -9,3 +9,5 @@ build/
 
 .idea/
 android/bin/
+
+**/android/local.properties

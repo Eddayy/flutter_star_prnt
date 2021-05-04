@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
   String emulationFor(String modelName) {
     String emulation = 'StarGraphic';
     if (modelName != null && modelName != '') {
-      final em = StarMicronicsUltilities.detectEmulation(modelName: modelName);
+      final em = StarMicronicsUtilities.detectEmulation(modelName: modelName);
       emulation = em?.emulation;
     }
     return emulation;
