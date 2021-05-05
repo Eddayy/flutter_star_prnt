@@ -1,6 +1,6 @@
 name: flutter_star_prnt
 description: Flutter plugin for using Star Micromics printers.
-version: 2.3.0
+version: 2.3.1
 homepage: https://github.com/Eddayy/flutter_star_prnt
 
 environment:

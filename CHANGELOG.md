@@ -1,3 +1,7 @@
+## 2.3.1
+
+- Update example
+
 ## 2.3.0
 
 - Credits to [Eldhose-Islet](https://github.com/Eldhose-Islet) for creating response status object PrinterResponseStatus

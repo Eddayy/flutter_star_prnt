@@ -60,42 +60,40 @@ class _MyAppState extends State<MyApp> {
                 list.forEach((port) async {
                   print(port.portName);
                   if (port.portName.isNotEmpty) {
-                    print(await StarPrnt.checkStatus(
+                    print(await StarPrnt.getStatus(
                       portName: port.portName,
                       emulation: emulationFor(port.modelName),
                     ));
 
                     PrintCommands commands = PrintCommands();
-                    Map<String, dynamic> rasterMap = {
-                      'appendBitmapText': "        Star Clothing Boutique\n" +
-                          "             123 Star Road\n" +
-                          "           City, State 12345\n" +
-                          "\n" +
-                          "Date:MM/DD/YYYY          Time:HH:MM PM\n" +
-                          "--------------------------------------\n" +
-                          "SALE\n" +
-                          "SKU            Description       Total\n" +
-                          "300678566      PLAIN T-SHIRT     10.99\n" +
-                          "300692003      BLACK DENIM       29.99\n" +
-                          "300651148      BLUE DENIM        29.99\n" +
-                          "300642980      STRIPED DRESS     49.99\n" +
-                          "30063847       BLACK BOOTS       35.99\n" +
-                          "\n" +
-                          "Subtotal                        156.95\n" +
-                          "Tax                               0.00\n" +
-                          "--------------------------------------\n" +
-                          "Total                           156.95\n" +
-                          "--------------------------------------\n" +
-                          "\n" +
-                          "Charge\n" +
-                          "156.95\n" +
-                          "Visa XXXX-XXXX-XXXX-0123\n" +
-                          "Refunds and Exchanges\n" +
-                          "Within 30 days with receipt\n" +
-                          "And tags attached\n",
-                    };
-                    commands.push(rasterMap);
-                    print(await StarPrnt.print(
+                    String raster = "        Star Clothing Boutique\n" +
+                        "             123 Star Road\n" +
+                        "           City, State 12345\n" +
+                        "\n" +
+                        "Date:MM/DD/YYYY          Time:HH:MM PM\n" +
+                        "--------------------------------------\n" +
+                        "SALE\n" +
+                        "SKU            Description       Total\n" +
+                        "300678566      PLAIN T-SHIRT     10.99\n" +
+                        "300692003      BLACK DENIM       29.99\n" +
+                        "300651148      BLUE DENIM        29.99\n" +
+                        "300642980      STRIPED DRESS     49.99\n" +
+                        "30063847       BLACK BOOTS       35.99\n" +
+                        "\n" +
+                        "Subtotal                        156.95\n" +
+                        "Tax                               0.00\n" +
+                        "--------------------------------------\n" +
+                        "Total                           156.95\n" +
+                        "--------------------------------------\n" +
+                        "\n" +
+                        "Charge\n" +
+                        "156.95\n" +
+                        "Visa XXXX-XXXX-XXXX-0123\n" +
+                        "Refunds and Exchanges\n" +
+                        "Within 30 days with receipt\n" +
+                        "And tags attached\n";
+                    commands.appendBitmapText(text: raster);
+                    print(await StarPrnt.sendCommands(
                         portName: port.portName,
                         emulation: emulationFor(port.modelName),
                         printCommands: commands));
@@ -113,18 +111,16 @@ class _MyAppState extends State<MyApp> {
                 list.forEach((port) async {
                   print(port.portName);
                   if (port.portName.isNotEmpty) {
-                    print(await StarPrnt.checkStatus(
+                    print(await StarPrnt.getStatus(
                       portName: port.portName,
                       emulation: emulationFor(port.modelName),
                     ));
 
                     PrintCommands commands = PrintCommands();
-                    Map<String, dynamic> rasterMap = {
-                      'appendBitmap':
-                          'https://c8.alamy.com/comp/MPCNP1/camera-logo-design-photograph-logo-vector-icons-MPCNP1.jpg'
-                    };
-                    commands.push(rasterMap);
-                    print(await StarPrnt.print(
+                    commands.appendBitmap(
+                        path:
+                            'https://c8.alamy.com/comp/MPCNP1/camera-logo-design-photograph-logo-vector-icons-MPCNP1.jpg');
+                    print(await StarPrnt.sendCommands(
                         portName: port.portName,
                         emulation: emulationFor(port.modelName),
                         printCommands: commands));
@@ -163,20 +159,19 @@ class _MyAppState extends State<MyApp> {
                 list.forEach((port) async {
                   print(port.portName);
                   if (port.portName.isNotEmpty) {
-                    print(await StarPrnt.checkStatus(
+                    print(await StarPrnt.getStatus(
                       portName: port.portName,
                       emulation: emulationFor(port.modelName),
                     ));
 
                     PrintCommands commands = PrintCommands();
-                    commands.push({'appendBitmapImg': img});
-
-                    commands.push({'diffusion': true});
-                    commands.push({'width': 576});
-                    commands.push({'bothScale': true});
-                    commands
-                        .push({'alignment': StarAlignmentPosition.Left.text});
-                    print(await StarPrnt.print(
+                    commands.appendBitmapByte(
+                      byteData: img,
+                      diffusion: true,
+                      bothScale: true,
+                      alignment: StarAlignmentPosition.Left,
+                    );
+                    print(await StarPrnt.sendCommands(
                         portName: port.portName,
                         emulation: emulationFor(port.modelName),
                         printCommands: commands));
