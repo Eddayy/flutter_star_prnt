@@ -305,6 +305,22 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                 } else {
                     builder.appendBitmap(image, diffusion: false)
                 }
+            } else if (command["appendBitmapByteArray"] != nil) {
+                let data:FlutterStandardTypedData = command["appendBitmapByteArray"] as! FlutterStandardTypedData
+                let image = UIImage(data: data.data)!
+                let width = command["width"] != nil ? (command["width"] as? NSNumber)?.intValue ?? 0 : 576
+                let bothScale = command["bothScale"] != nil ? command["bothScale"] as! Bool : true
+                let diffusion = command["diffusion"] != nil ? command["diffusion"] as! Bool : true
+                let rotation = getBitmapConverterRotation(command["rotation"] as? String)
+                if command["absolutePosition"] != nil {
+                    let position = ((command["absolutePosition"] as? NSNumber)?.intValue ?? 0) != 0 ? (command["absolutePosition"] as? NSNumber)?.intValue ?? 0 : 40
+                    builder.appendBitmap(withAbsolutePosition: image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation, position: position)
+                } else if command["alignment"] != nil {
+                    let alignment = getAlignment(command["alignment"] as?  String)
+                    builder.appendBitmap(withAlignment: image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation, position: alignment)
+                } else {
+                    builder.appendBitmap(image, diffusion: diffusion, width: width, bothScale: bothScale, rotation: rotation)
+                }
             }
         }
     }
