@@ -474,39 +474,6 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         } catch (e: Exception) {
           Log.e("FlutterStarPrnt", "appendbitmap failed", e)
         }
-      } else if (it.containsKey("appendBitmapImg")) {
-        val diffusion: kotlin.Boolean =
-            if (it.containsKey("diffusion")) (it["diffusion"].toString()).toBoolean() else true
-        val width: kotlin.Int =
-            if (it.containsKey("width")) (it["width"].toString()).toInt() else 576
-        val bothScale: kotlin.Boolean =
-            if (it.containsKey("bothScale")) (it["bothScale"].toString()).toBoolean() else true
-        val rotation: com.starmicronics.starioextension.ICommandBuilder.BitmapConverterRotation =
-            if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString())
-            else getConverterRotation("Normal")
-        val decodedString: ByteArray =
-            if (it.containsKey("appendBitmapImg")) (it["appendBitmapImg"] as ByteArray)
-            else ByteArray(0); // Base64.decode(bitmapString, Base64.DEFAULT)
-        val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        if (decodedByte != null) {
-          if (it.containsKey("absolutePosition")) {
-            builder.appendBitmapWithAbsolutePosition(
-                decodedByte,
-                diffusion,
-                width,
-                bothScale,
-                rotation,
-                (it["absolutePosition"].toString()).toInt())
-          } else if (it.containsKey("alignment")) {
-            builder.appendBitmapWithAlignment(
-                decodedByte,
-                diffusion,
-                width,
-                bothScale,
-                rotation,
-                getAlignment(it["alignment"].toString()))
-          } else builder.appendBitmap(decodedByte, diffusion, width, bothScale, rotation)
-        }
       } else if (it.containsKey("appendBitmapText")) {
         val fontSize: Float =
             if (it.containsKey("fontSize")) (it.get("fontSize").toString()).toFloat()
