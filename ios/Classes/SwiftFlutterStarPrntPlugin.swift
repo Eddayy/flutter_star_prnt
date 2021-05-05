@@ -30,31 +30,19 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         let type = arguments["type"] as! String
         do {
             var info = [Dictionary<String,String>]()
-            if (type == "All") {
-                let btPortInfoArray = try SMPort.searchPrinter(target: "All:")
-                for printer in btPortInfoArray {
-                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
-                }
-            }
-            if ( type == "Bluetooth" ) {
+            if ( type == "Bluetooth" || type == "All") {
                 let btPortInfoArray = try SMPort.searchPrinter(target: "BT:")
                 for printer in btPortInfoArray {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
                 }
             }
-            if ( type == "BluetoothLE" ) {
-                let btPortInfoArray = try SMPort.searchPrinter(target: "BTLE:")
-                for printer in btPortInfoArray {
-                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
-                }
-            }
-            if ( type == "LAN" ) {
+            if ( type == "LAN" || type == "All") {
                 let lanPortInfoArray = try SMPort.searchPrinter(target: "TCP:")
                 for printer in lanPortInfoArray {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
                 }
             }
-            if ( type == "USB" ) {
+            if ( type == "USB" || type == "All") {
                 let usbPortInfoArray = try SMPort.searchPrinter(target: "USB:")
                 for printer in usbPortInfoArray {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
@@ -86,16 +74,17 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
             }
             try port.getParsedStatus(starPrinterStatus: &status, level: 2)
             var firmwareInformation: Dictionary =  [AnyHashable:Any]()
+            var errorMsg:String?
             
             do {
                 firmwareInformation = try port.getFirmwareInformation()
             } catch {
-                
+                errorMsg = error.localizedDescription
             }
-            result(portStatusToDictionary(status: status,firmwareInformation: firmwareInformation))
+            result(portStatusToDictionary(status: status,firmwareInformation: firmwareInformation,errorMsg: errorMsg))
         } catch {
             result(
-                 FlutterError.init(code: "PORT_DISCOVERY_ERROR", message: error.localizedDescription, details: nil)
+                 FlutterError.init(code: "CHECK_STATUS_ERROR", message: error.localizedDescription, details: nil)
              )
         }
     }
@@ -113,7 +102,7 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         builder.beginDocument()
         appendCommands(builder: builder, printCommands: printCommands)
         builder.endDocument()
-        sendCommand(portName: portName, portSetting: portSettings, command: [UInt8](builder.commands),result: result)
+        sendCommand(portName: portName, portSetting: portSettings, command: [UInt8](builder.commands.copy() as! Data),result: result)
         
     }
     
@@ -133,13 +122,16 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
             default: return emulation
         }
     }
-    func portStatusToDictionary(status: StarPrinterStatus_2,firmwareInformation:Dictionary<AnyHashable,Any>) ->Dictionary<AnyHashable,Any> {
+    func portStatusToDictionary(status: StarPrinterStatus_2,firmwareInformation:Dictionary<AnyHashable,Any>,errorMsg:String?) ->Dictionary<AnyHashable,Any> {
+        let SM_TRUE =  SM_TRUESHARED
         let dict: Dictionary<AnyHashable,Any> =  [
-            "coverOpen" :status.coverOpen == SM_TRUESHARED,
-            "offline": status.offline == SM_TRUESHARED,
-            "overTemp": status.overTemp == SM_TRUESHARED,
-            "cutterError" :status.cutterError == SM_TRUESHARED,
-            "receiptPaperEmpty": status.receiptPaperEmpty == SM_TRUESHARED,
+            "coverOpen" :status.coverOpen == SM_TRUE,
+            "offline": status.offline == SM_TRUE,
+            "overTemp": status.overTemp == SM_TRUE,
+            "cutterError" :status.cutterError == SM_TRUE,
+            "receiptPaperEmpty": status.receiptPaperEmpty == SM_TRUE,
+            "is_success": true,
+            "error_message" :errorMsg ?? "",
         ]
         return dict.merging(firmwareInformation){ (current, _) in current }
     }
@@ -265,11 +257,11 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                 } else {
                     builder.appendQrCodeData((command["appendQrCode"] as! String).data(using: encoding), model: qrCodeModel, level: qrCodeLevel, cell: cell)
                 }
-            } else if (command["appendBitmap"] != nil) {
+            }else if (command["appendBitmap"] != nil) {
                 let urlString = command["appendBitmap"] as? String
                 let width = command["width"] != nil ? (command["width"] as? NSNumber)?.intValue ?? 0 : 576
-                let bothScale = command["bothScale"] != nil ? command["bothScale"] as! Bool : true
-                let diffusion = command["diffusion"] != nil ? command["diffusion"] as! Bool : true
+                let diffusion = ((command["diffusion"] as? NSNumber)?.boolValue ?? false == false) ? false : true
+                let bothScale = ((command["bothScale"] as? NSNumber)?.boolValue ?? false == false) ? false : true
                 let rotation = getBitmapConverterRotation(command["rotation"] as? String)
                 let error: Error? = nil
                 let imageURL = URL(string: urlString ?? "")
@@ -279,6 +271,8 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                         imageData = try Data(contentsOf: imageURL, options: .uncached)
                     }
                 } catch {
+                }
+                if error != nil {
                     let fileImageURL = URL(fileURLWithPath: urlString ?? "")
                     do {
                         imageData = try Data(contentsOf: fileImageURL)
@@ -718,24 +712,62 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
 
         do {
             port = try SMPort.getPort(portName: portName, portSettings: portSetting, ioTimeoutMillis: 10000)
+            let SM_TRUE =  SM_TRUESHARED
+            
+            var json = Dictionary<AnyHashable, Any>()
             defer {
                 SMPort.release(port)
             }
             usleep(200000)
             try port.beginCheckedBlock(starPrinterStatus: &status, level: 2)
-            if status.offline == SM_TRUESHARED {
-                result(
-                    FlutterError.init(code: "STARIO_PRINT_EXCEPTION", message: "printer is offline", details: nil)
-                )
+            json = portStatusToDictionary(status: status, firmwareInformation: [String:Any](),errorMsg: nil)
+            var isSucess = true
+             if (status.coverOpen == SM_TRUE) {
+              json["error_message"] = "Printer cover is open"
+              isSucess = false
+            } else if (status.receiptPaperEmpty == SM_TRUE) {
+              json["error_message"] = "Paper empty"
+              isSucess = false
+            }else if (status.presenterPaperJamError == SM_TRUE) {
+              json["error_message"] = "Paper Jam"
+              isSucess = false
+            }else if (status.offline == SM_TRUE) {
+              json["error_message"] = "A printer is offline"
+              isSucess = false
             }
-            var total: UInt32 = 0
-            while total < UInt32(command.count) {
-                var written: UInt32 = 0
-                try port.write(writeBuffer: command, offset: total, size: UInt32(command.count) - total, numberOfBytesWritten: &written)
-                total += written
+
+            if (status.receiptPaperNearEmptyInner == SM_TRUE || status.receiptPaperNearEmptyOuter == SM_TRUE){
+              json["info_message"] = "Paper near empty"
             }
-            try port.endCheckedBlock(starPrinterStatus: &status, level: 2)
-            result("Success")
+            if isSucess {
+                var total: UInt32 = 0
+                while total < UInt32(command.count) {
+                    var written: UInt32 = 0
+                    try port.write(writeBuffer: command, offset: total, size: UInt32(command.count) - total, numberOfBytesWritten: &written)
+                    total += written
+                }
+                try port.endCheckedBlock(starPrinterStatus: &status, level: 2)
+                let newStat = portStatusToDictionary(status: status, firmwareInformation: [String:Any](),errorMsg: nil)
+                
+                json.merge(newStat) {  (current, _) in current}
+                if (status.coverOpen == SM_TRUE) {
+                  json["error_message"] = "Printer cover is open"
+                } else if (status.receiptPaperEmpty == SM_TRUE) {
+                  json["error_message"] = "Paper empty"
+                }else if (status.presenterPaperJamError == SM_TRUE) {
+                  json["error_message"] = "Paper Jam"
+                }else if (status.offline == SM_TRUE) {
+                  json["error_message"] = "A printer is offline"
+                  isSucess = false
+                }
+            }
+        
+            if (status.receiptPaperNearEmptyInner == SM_TRUE || status.receiptPaperNearEmptyOuter == SM_TRUE){
+              json["error_message"] = "Paper near empty"
+            }
+            json["is_success"] = isSucess
+            result(json)
+
         } catch {
             result(
               FlutterError.init(code: "STARIO_PRINT_EXCEPTION", message: error.localizedDescription, details: nil)
