@@ -38,7 +38,7 @@ class StarPrnt {
     );
   }
 
-  /// Sends [PrintCommands] to the printer. Have specify [portName] and [emulation]. Returns [PrinterResponseStatus]
+  /// Sends [PrintCommands] to the printer. Have to specify [portName] and [emulation]. Returns [PrinterResponseStatus]
   static Future<PrinterResponseStatus> sendCommands({
     required String portName,
     required String emulation,
