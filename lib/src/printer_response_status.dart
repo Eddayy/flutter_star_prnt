@@ -4,16 +4,36 @@
 
 import 'dart:convert';
 
+/// Response class for printer status
 class PrinterResponseStatus {
+  /// Whether the printer is offline
   final bool offline;
+
+  /// Whether the cover is open
   final bool coverOpen;
+
+  /// Whether cutter has error
   final bool cutterError;
+
+  /// Whether printer has receipt paper
   final bool receiptPaperEmpty;
+
+  /// Error response from printer
   final String? errorMessage;
+
+  /// Status command after sent to printer
   final bool isSuccess;
+
+  /// Whether printer is overheating
   final bool overTemp;
+
+  /// Extra info on printer status
   final String? infoMessage;
+
+  /// Printer model name
   final String? modelName;
+
+  /// Printer firmware version
   final String? firmwareVersion;
 
   PrinterResponseStatus({
@@ -29,6 +49,7 @@ class PrinterResponseStatus {
     this.firmwareVersion,
   });
 
+  ///Creates a copy of [PrinterResponseStatus] but with given field replace with new values
   PrinterResponseStatus copyWith({
     bool? offline,
     bool? coverOpen,
@@ -55,6 +76,7 @@ class PrinterResponseStatus {
     );
   }
 
+  ///Map [PrinterResponseStatus] into a Map
   Map<String, dynamic> toMap() {
     return {
       'offline': offline,
@@ -70,6 +92,7 @@ class PrinterResponseStatus {
     };
   }
 
+  ///Turn Map into [PrinterResponseStatus]
   factory PrinterResponseStatus.fromMap(Map<String, dynamic> map) {
     return PrinterResponseStatus(
       offline: map['offline'] ?? true,
@@ -85,8 +108,10 @@ class PrinterResponseStatus {
     );
   }
 
+  ///Turn [PrinterResponseStatus] into JsonString
   String toJson() => json.encode(toMap());
 
+  ///Create from JsonString [PrinterResponseStatus]
   factory PrinterResponseStatus.fromJson(String source) =>
       PrinterResponseStatus.fromMap(json.decode(source));
 

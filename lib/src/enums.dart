@@ -1,11 +1,19 @@
 ///Enum for Star Port type
 enum StarPortType {
+  /// checks all ports
   All,
+
+  /// Checks lan or wifi
   LAN,
+
+  /// Checks bluetooth port
   Bluetooth,
+
+  /// Checks USB port
   USB,
 }
 
+///Converts enum to String
 extension ExtendedPortype on StarPortType {
   String get text {
     return this.toString().split('.').last;
@@ -23,6 +31,7 @@ enum StarEmulation {
   StarDotImpact,
 }
 
+///Converts enum to String
 extension ExtendedEmulation on StarEmulation {
   String get text {
     return this.toString().split('.').last;
@@ -40,6 +49,7 @@ enum StarEncoding {
   UTF8
 }
 
+///Converts enum to String
 extension ExtendedEncoding on StarEncoding {
   String? get text => const {
         StarEncoding.USASCII: "US-ASCII",
@@ -95,32 +105,66 @@ enum StarCodePageType {
   Blank,
 }
 
+///Converts enum to String
 extension ExtendedCodePageType on StarCodePageType {
   String get text {
     return this.toString().split('.').last;
   }
 }
 
-///Constant for possible InternationalType
+///Constant for possible International character mode possible
 enum StarInternationalType {
+  /// UK character mode
   UK,
+
+  /// USA character mode
   USA,
+
+  /// French character mode
   France,
+
+  /// German character mode
   Germany,
+
+  /// German character mode
   Denmark,
+
+  /// Sweden character mode
+
   Sweden,
+
+  /// Italy character mode
   Italy,
+
+  /// Spain character mode
   Spain,
+
+  /// Japan character mode
   Japan,
+
+  /// Norway character mode
   Norway,
+
+  /// Denmark2 character mode
   Denmark2,
+
+  /// Spain2 character mode
   Spain2,
+
+  /// LatinAmerica character mode
   LatinAmerica,
+
+  /// Korea character mode
   Korea,
+
+  /// Ireland character mode
   Ireland,
+
+  /// Legal character mode
   Legal,
 }
 
+///Converts enum to String
 extension ExtendedStarInternationalType on StarInternationalType {
   String get text {
     return this.toString().split('.').last;
@@ -136,6 +180,7 @@ enum StarFontStyleType {
   B,
 }
 
+///Converts enum to String
 extension ExtendedStarFontStyleType on StarFontStyleType {
   String get text {
     return this.toString().split('.').last;
@@ -144,12 +189,20 @@ extension ExtendedStarFontStyleType on StarFontStyleType {
 
 ///Constant for possible CutPaperAction
 enum StarCutPaperAction {
+  /// Full cut
   FullCut,
+
+  /// Full cut with feed
   FullCutWithFeed,
+
+  /// Partial cut
   PartialCut,
+
+  /// Partial cut with feed
   PartialCutWithFeed,
 }
 
+///Converts enum to String
 extension ExtendedStarCutPaperAction on StarCutPaperAction {
   String get text {
     return this.toString().split('.').last;
@@ -163,6 +216,7 @@ enum StarBlackMarkType {
   ValidWithDetection,
 }
 
+///Converts enum to String
 extension ExtendedStarBlackMarkType on StarBlackMarkType {
   String get text {
     return this.toString().split('.').last;
@@ -171,11 +225,17 @@ extension ExtendedStarBlackMarkType on StarBlackMarkType {
 
 ///Constant for possible AlignmentPosition
 enum StarAlignmentPosition {
+  /// Left alignment
   Left,
+
+  /// Center alignment
   Center,
+
+  /// Right alignment
   Right,
 }
 
+///Converts enum to String
 extension ExtendedStarAlignmentPosition on StarAlignmentPosition {
   String get text {
     return this.toString().split('.').last;
@@ -190,6 +250,7 @@ enum StarLogoSize {
   DoubleWidthDoubleHeight,
 }
 
+///Converts enum to String
 extension ExtendedStarLogoSize on StarLogoSize {
   String get text {
     return this.toString().split('.').last;
@@ -209,6 +270,7 @@ enum StarBarcodeSymbology {
   UPCE,
 }
 
+///Converts enum to String
 extension ExtendedStarBarcodeSymbology on StarBarcodeSymbology {
   String get text {
     return this.toString().split('.').last;
@@ -228,6 +290,7 @@ enum StarBarcodeWidth {
   Mode9,
 }
 
+///Converts enum to String
 extension ExtendedStarBarcodeWidth on StarBarcodeWidth {
   String get text {
     return this.toString().split('.').last;
@@ -240,6 +303,7 @@ enum StarQrCodeModel {
   No2,
 }
 
+///Converts enum to String
 extension ExtendedStarQrCodeModel on StarQrCodeModel {
   String get text {
     return this.toString().split('.').last;
@@ -254,6 +318,7 @@ enum StarQrCodeLevel {
   Q,
 }
 
+///Converts enum to String
 extension ExtendedStarQrCodeLevel on StarQrCodeLevel {
   String get text {
     return this.toString().split('.').last;
@@ -268,6 +333,7 @@ enum StarBitmapConverterRotation {
   Rotate180,
 }
 
+///Converts enum to String
 extension ExtendedStarBitmapConverterRotation on StarBitmapConverterRotation {
   String get text {
     return this.toString().split('.').last;
