@@ -27,7 +27,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
 
@@ -131,6 +130,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       result.error("PORT_DISCOVERY_ERROR", e.message, null)
     }
   }
+
   public fun checkStatus(@NonNull call: MethodCall, @NonNull result: Result) {
     val portName: String = call.argument<String>("portName") as String
     val emulation: String = call.argument<String>("emulation") as String
@@ -147,20 +147,15 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       } catch (e: InterruptedException) {}
 
       val status: StarPrinterStatus = port.retreiveStatus()
-
-
-      val json: MutableMap<String, Any?> = mutableMapOf()
+      var json: MutableMap<String, Any?> = mutableMapOf()
       json["is_success"] = true
-      json["offline"] = status.offline
-      json["coverOpen"] = status.coverOpen
-      json["overTemp"] = status.overTemp
-      json["cutterError"] = status.cutterError
-      json["receiptPaperEmpty"] = status.receiptPaperEmpty
       try {
         val firmwareInformationMap: Map<String, String> = port.firmwareInformation
-        json["ModelName"] = firmwareInformationMap["ModelName"]
-        json["FirmwareVersion"] = firmwareInformationMap["FirmwareVersion"]
+        val (_,jsn) = getIsAvailableForPrintAndStatusMap(status,firmwareInformationMap);
+        json = jsn.toMutableMap()
       }catch (e: Exception) {
+        val (_,jsn) = getIsAvailableForPrintAndStatusMap(status,null);
+        json = jsn.toMutableMap()
         json["error_message"] = e.message
       }
       result.success(json)
@@ -234,12 +229,8 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     val printCommands: ArrayList<Map<String, Any>> =
         call.argument<ArrayList<Map<String, Any>>>("printCommands") as ArrayList<Map<String, Any>>
     if (printCommands.size < 1) {
-      val json: MutableMap<String, Any?> = mutableMapOf()
-
-      json["offline"] = false
-      json["coverOpen"] = false
-      json["cutterError"] = false
-      json["receiptPaperEmpty"] = false
+      val (_,jsn) = getIsAvailableForPrintAndStatusMap(null,null);
+      val json: MutableMap<String, Any?> = jsn.toMutableMap()
       json["info_message"] = "No dat to print"
       json["is_success"] = true
       result.success(json)
@@ -741,37 +732,18 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     var port: StarIOPort? = null
     var errorPosSting = ""
     try {
-      port = StarIOPort.getPort(portName, portSettings, 10000, applicationContext)
+      port = StarIOPort.getPort(portName, portSettings, 10000, context)
       errorPosSting += "Port Opened,"
       try {
         Thread.sleep(100)
       } catch (e: InterruptedException) {}
       var status: StarPrinterStatus = port.beginCheckedBlock()
-      val json: MutableMap<String, Any?> = mutableMapOf()
-      errorPosSting += "got status for begin Check,"
-      json["offline"] = status.offline
-      json["coverOpen"] = status.coverOpen
-      json["cutterError"] = status.cutterError
-      json["receiptPaperEmpty"] = status.receiptPaperEmpty
-      var isSucess = true
-      if (status.offline) {
-        json["error_message"] = "A printer is offline"
-        isSucess = false
-      } else if (status.coverOpen) {
-        json["error_message"] = "Printer cover is open"
-        isSucess = false
-      } else if (status.receiptPaperEmpty) {
-        json["error_message"] = "Paper empty"
-        isSucess = false
-      } else if (status.presenterPaperJamError) {
-        json["error_message"] = "Paper Jam"
-        isSucess = false
-      }
 
-      if (status.receiptPaperNearEmptyInner || status.receiptPaperNearEmptyOuter) {
-        json["error_message"] = "Paper near empty"
-      }
-      if (isSucess) {
+      val (success,jsn) = getIsAvailableForPrintAndStatusMap(status,null);
+      var json: MutableMap<String, Any?> = jsn.toMutableMap()
+      errorPosSting += "got status for begin Check,"
+      var isSuccess = success
+      if (isSuccess) {
         errorPosSting += "Writing to port,"
         port.writePort(commands, 0, commands.size)
         errorPosSting += "setting delay End check bock,"
@@ -782,26 +754,11 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         }catch (e:Exception){
           errorPosSting += "End check bock exeption ${e.toString()},"
         }
-
-        json["offline"] = status.offline
-        json["coverOpen"] = status.coverOpen
-        json["cutterError"] = status.cutterError
-        json["receiptPaperEmpty"] = status.receiptPaperEmpty
-        if (status.offline) {
-          json["error_message"] = "A printer is offline"
-          isSucess = false
-        } else if (status.coverOpen) {
-          json["error_message"] = "Printer cover is open"
-          isSucess = false
-        } else if (status.receiptPaperEmpty) {
-          json["error_message"] = "Paper empty"
-          isSucess = false
-        } else if (status.presenterPaperJamError) {
-          json["error_message"] = "Paper Jam"
-          isSucess = false
-        }
+        val (success,jsn) = getIsAvailableForPrintAndStatusMap(status,null);
+        json = jsn.toMutableMap()
+        isSuccess = success
       }
-      json["is_success"] = isSucess
+      json["is_success"] = isSuccess
       result.success(json)
     } catch (e: Exception) {
       result.error("STARIO_PORT_EXCEPTION", e.message + " Failed After $errorPosSting", null)
@@ -816,4 +773,134 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       }
     }
   }
+
+  // created from SendCommandDoNotCheckConditionThread Star io sdk example
+  private fun sendCommandSpeedOptimize(
+          portName: String,
+          portSettings: String,
+          commands: ByteArray,
+          context: Context,
+          useStartEndBlock: Boolean,
+          fastPrintWithBlock:Boolean,
+          @NonNull result: Result
+  ) {
+    var port: StarIOPort? = null
+    var errorPosSting = ""
+    try {
+      // Timeout here will not affect the time for print , it is the maximum time which printer will give for the operation . after the printer will clear this opertation
+
+      // Random testing on TSP650II from iOS simulator took 0.010052266 seconds
+      port = StarIOPort.getPort(portName, portSettings, 10000, context)
+      errorPosSting += "Port Opened,"
+//      Commenting as this delay is not in SendCommandDoNotCheckConditionThread Star io sdk example
+//      try {
+//        Thread.sleep(100)
+//      } catch (e: InterruptedException) {}
+
+      var json: MutableMap<String, Any?> = mutableMapOf()
+      var isSuccess = true
+      var status: StarPrinterStatus? = null
+      if (useStartEndBlock){
+        if (fastPrintWithBlock){
+          errorPosSting += "got status for begin Check,"
+          // Random testing on TSP650II from iOS simulator took 0.015870016 seconds
+          status = port.retreiveStatus()
+        }else{
+          errorPosSting += "got status for begin Check,"
+          // Random testing on TSP650II from iOS simulator took 0.660638043 seconds
+          status = port.beginCheckedBlock()
+        }
+        val (success,jsn) = getIsAvailableForPrintAndStatusMap(status,null);
+        json  = jsn.toMutableMap()
+        isSuccess = success
+      }
+      if (isSuccess) {
+        errorPosSting += "Writing to port,"
+        port.writePort(commands, 0, commands.size)
+        if (useStartEndBlock){
+          if (fastPrintWithBlock){
+            errorPosSting += "doing status check after commands,"
+            status = port.retreiveStatus()
+          }else{
+            errorPosSting += "setting delay End check bock,"
+            port.setEndCheckedBlockTimeoutMillis(30000) // Change the timeout time of endCheckedBlock method.
+            errorPosSting += "doing End check bock,"
+            try {
+              status = port.endCheckedBlock()
+            }catch (e:Exception){
+              errorPosSting += "End check bock Exception ${e.toString()},"
+            }
+          }
+          val (success,jsn) = getIsAvailableForPrintAndStatusMap(status,null);
+          json = jsn.toMutableMap()
+          isSuccess = success
+        }
+      }
+      json["is_success"] = isSuccess
+      result.success(json)
+    } catch (e: Exception) {
+      result.error("STARIO_PORT_EXCEPTION", e.message + " Failed After $errorPosSting", null)
+    } finally {
+      if (port != null) {
+        try {
+          StarIOPort.releasePort(port)
+        } catch (e: Exception) {
+          // not calling error becouse error or status is already called from try or catch.. ignoring this exception now
+//            result.error("PRINT_ERROR", e.message, null)
+        }
+      }
+    }
+  }
+  private fun getIsAvailableForPrintAndStatusMap(status: StarPrinterStatus?,firmwareInformationMap:Map<String, String>?)  : Pair<Boolean,Map<String, Any?>> {
+    val json: MutableMap<String, Any?> = mutableMapOf()
+    var retVal = true;
+    if (firmwareInformationMap != null){
+      json["ModelName"] = firmwareInformationMap["ModelName"]
+      json["FirmwareVersion"] = firmwareInformationMap["FirmwareVersion"]
+    }
+    if (status == null){
+//      return dummy
+      json["offline"] = false
+      json["coverOpen"] = false
+      json["cutterError"] = false
+      json["overTemp"] = false
+      json["receiptPaperEmpty"] = false
+      json["is_success"] = true
+      return Pair(retVal,json)
+    }
+    json["offline"] = status.offline
+    json["coverOpen"] = status.coverOpen
+    json["overTemp"] = status.overTemp
+    json["cutterError"] = status.cutterError
+    json["receiptPaperEmpty"] = status.receiptPaperEmpty
+
+    when {
+      status.coverOpen -> {
+        json["error_message"] = "Printer cover is open"
+        retVal = false
+      }
+      status.receiptPaperEmpty -> {
+        json["error_message"] = "Paper empty"
+        retVal = false
+      }
+      status.presenterPaperJamError -> {
+        json["error_message"] = "Paper Jam"
+        retVal = false
+      }
+      status.offline -> {
+        json["error_message"] = "A printer is offline"
+        retVal = false
+      }
+    }
+    if (status.receiptPaperNearEmptyInner || status.receiptPaperNearEmptyOuter){
+      if (json["error_message"] == null)  {
+        json["error_message"] = "Paper near empty"
+      }
+      json["info_message"] = "Paper near empty"
+
+    }
+    return Pair(retVal,json)
+  }
+
+
 }
