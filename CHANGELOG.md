@@ -1,3 +1,7 @@
+## 2.3.3
+
+- Fix android missing lib
+
 ## 2.3.2
 
 - Fix appendbitmap not working on paths

@@ -30,6 +30,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
+import android.webkit.URLUtil
 
 /** FlutterStarPrntPlugin */
 public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
