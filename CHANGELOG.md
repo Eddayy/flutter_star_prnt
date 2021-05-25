@@ -1,6 +1,6 @@
 ## 2.3.2
 
-- Update example
+- Fix appendbitmap not working on paths
 
 ## 2.3.1
 
