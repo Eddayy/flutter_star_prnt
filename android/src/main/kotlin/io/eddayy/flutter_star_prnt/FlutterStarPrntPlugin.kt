@@ -452,25 +452,33 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
             if (it.containsKey("rotation")) getConverterRotation(it.get("rotation").toString())
             else getConverterRotation("Normal")
         try {
-            val imageUri: Uri = Uri.parse(it.get("appendBitmap").toString())
-            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri)
-            if (it.containsKey("absolutePosition")) {
-              builder.appendBitmapWithAbsolutePosition(
-                  bitmap,
-                  diffusion,
-                  width,
-                  bothScale,
-                  rotation,
-                  (it.get("absolutePosition").toString()).toInt())
-            } else if (it.containsKey("alignment")) {
-              builder.appendBitmapWithAlignment(
-                  bitmap,
-                  diffusion,
-                  width,
-                  bothScale,
-                  rotation,
-                  getAlignment(it.get("alignment").toString()))
-            } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
+            var bitmap: Bitmap? = null
+            if (URLUtil.isValidUrl(it.get("appendBitmap").toString())) {
+              val imageUri: Uri = Uri.parse(it.get("appendBitmap").toString())
+              bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri)
+            } else {
+              bitmap = BitmapFactory.decodeFile(it.get("appendBitmap").toString())
+            }
+
+            if (bitmap != null) {
+              if (it.containsKey("absolutePosition")) {
+                builder.appendBitmapWithAbsolutePosition(
+                    bitmap,
+                    diffusion,
+                    width,
+                    bothScale,
+                    rotation,
+                    (it.get("absolutePosition").toString()).toInt())
+              } else if (it.containsKey("alignment")) {
+                builder.appendBitmapWithAlignment(
+                    bitmap,
+                    diffusion,
+                    width,
+                    bothScale,
+                    rotation,
+                    getAlignment(it.get("alignment").toString()))
+              } else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation)
+            }
         } catch (e: Exception) {
           Log.e("FlutterStarPrnt", "appendbitmap failed", e)
         }

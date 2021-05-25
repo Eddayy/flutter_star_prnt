@@ -271,8 +271,6 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                         imageData = try Data(contentsOf: imageURL, options: .uncached)
                     }
                 } catch {
-                }
-                if error != nil {
                     let fileImageURL = URL(fileURLWithPath: urlString ?? "")
                     do {
                         imageData = try Data(contentsOf: fileImageURL)
