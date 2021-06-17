@@ -272,11 +272,11 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         arrayDiscovery.add(port)
       }
     }
-    // if (interfaceName == "USB" || interfaceName == "All") {
-    //   for (port in StarIOPort.searchPrinter("USB:")) {
-    //     arrayDiscovery.add(port)
-    //   }
-    // }
+     if (interfaceName == "USB" || interfaceName == "All") {
+       for (port in StarIOPort.searchPrinter("USB:", applicationContext)) {
+         arrayDiscovery.add(port)
+       }
+     }
     for (discovery in arrayDiscovery) {
       val port: MutableMap<String, String> = mutableMapOf<String, String>()
 
