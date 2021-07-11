@@ -54,6 +54,30 @@ class StarPrnt {
     );
   }
 
+  /// Sends [PrintCommands] optimized for speed to the printer.Should execute faster than sendCommands with diffrent option. Have to specify [portName] , [emulation]
+  /// [useStartEndBlock] making this true make execution faster but it can case printer hang with Bluetooth printer or USB printer
+  /// pass this false for Bluetooth or USB
+  /// . Returns [PrinterResponseStatus]
+  static Future<PrinterResponseStatus> sendCommandsSpeedOptimized({
+    required String portName,
+    required String emulation,
+    required PrintCommands printCommands,
+    required bool useStartEndBlock,
+  }) async {
+    dynamic result = await _channel.invokeMethod('print', {
+      'portName': portName,
+      'emulation': emulation,
+      'printCommands': printCommands.getCommands(),
+      'fastPrint': true,
+      'useStartEndBlock': useStartEndBlock,
+      'fastPrintWithBlock':
+          true, // making this false will make this function almost equal to sendCommands
+    });
+    return PrinterResponseStatus.fromMap(
+      Map<String, dynamic>.from(result),
+    );
+  }
+
   /// sends commands to printer to run
   @Deprecated('Use sendCommands instead.')
   static Future<dynamic> print({
