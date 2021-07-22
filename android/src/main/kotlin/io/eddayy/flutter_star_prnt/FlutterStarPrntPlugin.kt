@@ -10,12 +10,14 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.Log
+import android.webkit.URLUtil
 import androidx.annotation.NonNull
 import com.starmicronics.stario.PortInfo
 import com.starmicronics.stario.StarIOPort
 import com.starmicronics.stario.StarPrinterStatus
 import com.starmicronics.starioextension.ICommandBuilder
-import com.starmicronics.starioextension.ICommandBuilder.*
+import com.starmicronics.starioextension.ICommandBuilder.CodePageType
+import com.starmicronics.starioextension.ICommandBuilder.CutPaperAction
 import com.starmicronics.starioextension.IConnectionCallback
 import com.starmicronics.starioextension.StarIoExt
 import com.starmicronics.starioextension.StarIoExt.Emulation
@@ -27,9 +29,32 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.io.Console
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
-import android.webkit.URLUtil
+
+object PrinterSettingConstant {
+  const val LANGUAGE_ENGLISH = 0
+  const val LANGUAGE_JAPANESE = 1
+  const val LANGUAGE_FRENCH = 2
+  const val LANGUAGE_PORTUGUESE = 3
+  const val LANGUAGE_SPANISH = 4
+  const val LANGUAGE_GERMAN = 5
+  const val LANGUAGE_RUSSIAN = 6
+  const val LANGUAGE_SIMPLIFIED_CHINESE = 7
+  const val LANGUAGE_TRADITIONAL_CHINESE = 8
+  const val LANGUAGE_CJK_UNIFIED_IDEOGRAPH = 9
+  const val PAPER_SIZE_TWO_INCH = 384
+  const val PAPER_SIZE_THREE_INCH = 576
+  const val PAPER_SIZE_FOUR_INCH = 832
+  const val PAPER_SIZE_ESCPOS_THREE_INCH = 512
+  const val PAPER_SIZE_DOT_THREE_INCH = 210
+  const val PAPER_SIZE_SK1_TWO_INCH = 432
+  const val IF_TYPE_ETHERNET = "TCP:"
+  const val IF_TYPE_BLUETOOTH = "BT:"
+  const val IF_TYPE_USB = "USB:"
+  const val IF_TYPE_MANUAL = "Manual:"
+}
 
 /** FlutterStarPrntPlugin */
 public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
@@ -254,19 +279,32 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     val arrayPorts: MutableList<Map<String, String>> = mutableListOf<Map<String, String>>()
 
     if (interfaceName == "Bluetooth" || interfaceName == "All") {
-      for (portInfo in StarIOPort.searchPrinter("BT:")) {
-        arrayDiscovery.add(portInfo)
+      try {
+        for (port in StarIOPort.searchPrinter(PrinterSettingConstant.IF_TYPE_BLUETOOTH,applicationContext)) {
+          arrayDiscovery.add(port)
+        }
+      }catch (e: Exception) {
+        println(e.message)
       }
     }
-    if (interfaceName == "LAN" || interfaceName == "All") {                   
-      for (port in StarIOPort.searchPrinter("TCP:")) {
-        arrayDiscovery.add(port)
+    if (interfaceName == "LAN" || interfaceName == "All") {
+      try {
+        for (port in StarIOPort.searchPrinter(PrinterSettingConstant.IF_TYPE_ETHERNET,applicationContext)) {
+          arrayDiscovery.add(port)
+        }
+      }catch (e: Exception) {
+        println(e.message)
       }
     }
     if (interfaceName == "USB" || interfaceName == "All") {
-      for (port in StarIOPort.searchPrinter("USB:")) {
-        arrayDiscovery.add(port)
+      try {
+        for (port in StarIOPort.searchPrinter(PrinterSettingConstant.IF_TYPE_USB,applicationContext)) {
+          arrayDiscovery.add(port)
+        }
+      }catch (e: Exception) {
+        println(e.message)
       }
+
     }
     for (discovery in arrayDiscovery) {
       val port: MutableMap<String, String> = mutableMapOf<String, String>()
