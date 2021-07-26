@@ -431,7 +431,21 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
       } else if (it.containsKey("appendHorizontalTabPosition"))
           builder.appendHorizontalTabPosition(
               it.get("appendHorizontalTabPosition") as IntArray) // TODO: test this in the future
-      else if (it.containsKey("appendLogo")) {
+      else if (it.containsKey("appendMultiple")) {
+        val width: Int = if (it.containsKey("width")) (it["width"].toString()).toInt() else 2
+        val height: Int = if (it.containsKey("height")) (it.get("height").toString()).toInt() else 2
+        builder.appendMultiple(it["appendMultiple"].toString().toByteArray(encoding),width,height)
+      }else if (it.containsKey("enableMultiple")) {
+        val enable: Boolean =
+                 (it["enableMultiple"].toString()).toBoolean()
+        if (enable){
+          val width: Int = if (it.containsKey("width")) (it.get("width").toString()).toInt() else 1
+          val height: Int = if (it.containsKey("height")) (it.get("height").toString()).toInt() else 1
+          builder.appendMultiple(width,height);
+        }else{
+          builder.appendMultiple(1,1);
+        }
+      }else if (it.containsKey("appendLogo")) {
         if (it.containsKey("logoSize"))
             builder.appendLogo(
                 getLogoSize(it.get("logoSize") as String), it.get("appendLogo") as Int)

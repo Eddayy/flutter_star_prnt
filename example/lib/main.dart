@@ -180,6 +180,24 @@ class _MyAppState extends State<MyApp> {
               },
               child: Text('Print from genrated image'),
             ),
+            TextButton(
+              onPressed: () async {
+                final img = await _capturePng();
+                setState(() {
+                  isLoading = true;
+                });
+
+                PrintCommands commands = PrintCommands();
+                Map<String, dynamic> command = {
+                  "appendMultiple": "\n\nHello\nLarge Text\n",
+                };
+                command['width'] = 2;
+                command['height'] = 2;
+                commands.push(command);
+                findAllPrinterAndSendCommand(commands);
+              },
+              child: Text('Print Double size text'),
+            ),
           ],
         ),
       ),

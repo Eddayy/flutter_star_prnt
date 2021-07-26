@@ -254,9 +254,9 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                 let height = command["height"] != nil ? command["height"] as! Int : 2
                 builder.appendData(withMultiple: (command["appendMultiple"] as! String).data(using: encoding), width: width, height: height)
             } else if (command["enableMultiple"] != nil) {
-                let width = command["width"] != nil ? command["width"] as! Int : 1
-                let height = command["height"] != nil ? command["height"] as! Int : 1
                 if ( command["enableMultiple"] as! Bool) == true {
+                    let width = command["width"] != nil ? command["width"] as! Int : 1
+                    let height = command["height"] != nil ? command["height"] as! Int : 1
                     builder.appendMultiple(width, height: height)
                 } else {
                     builder.appendMultiple(1, height: 1)
