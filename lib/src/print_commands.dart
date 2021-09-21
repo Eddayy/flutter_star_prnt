@@ -205,7 +205,7 @@ class PrintCommands {
     );
 
     final PipelineOwner pipelineOwner = PipelineOwner();
-    final BuildOwner buildOwner = BuildOwner();
+    final BuildOwner buildOwner = BuildOwner(focusManager: FocusManager());
 
     pipelineOwner.rootNode = renderView;
     renderView.prepareInitialFrame();
