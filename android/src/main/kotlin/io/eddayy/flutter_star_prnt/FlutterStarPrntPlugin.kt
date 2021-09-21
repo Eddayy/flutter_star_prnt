@@ -277,7 +277,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
         for (port in StarIOPort.searchPrinter("USB:", applicationContext)) {
           arrayDiscovery.add(port)
         }
-      } catch (e: StarIOPortException) {
+      } catch (e: Exception) {
         Log.e("FlutterStarPrnt", "usb not conncted", e)
       }
     }

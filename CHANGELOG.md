@@ -1,4 +1,4 @@
-## 2.3.5
+## 2.3.6
 
 - Fix crashes when using usb with android
 
