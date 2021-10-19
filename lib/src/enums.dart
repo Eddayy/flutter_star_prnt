@@ -9,6 +9,9 @@ enum StarPortType {
   /// Checks bluetooth port
   Bluetooth,
 
+  /// Checks bluetooth low energy port
+  BluetoothLowEnergy,
+
   /// Checks USB port
   USB,
 }
