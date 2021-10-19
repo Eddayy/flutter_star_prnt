@@ -36,6 +36,12 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                     info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
                 }
             }
+            if ( type == "BluetoothLowEnergy" || type == "All") {
+                let btPortInfoArray = try SMPort.searchPrinter(target: "BLE:")
+                for printer in btPortInfoArray {
+                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
+                }
+            }
             if ( type == "LAN" || type == "All") {
                 let lanPortInfoArray = try SMPort.searchPrinter(target: "TCP:")
                 for printer in lanPortInfoArray {
