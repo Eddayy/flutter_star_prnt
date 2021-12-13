@@ -1,3 +1,11 @@
+## 2.3.6
+
+- Fix crashes when using usb with android
+
+## 2.3.4
+
+- Credits to [jobsorrow](https://github.com/jobsorrow) for fixing android usb type connection
+
 ## 2.3.3
 
 - Fix android missing lib

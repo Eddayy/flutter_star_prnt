@@ -302,7 +302,7 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
           arrayDiscovery.add(port)
         }
       }catch (e: Exception) {
-        println(e.message)
+       Log.e("FlutterStarPrnt", "usb not conncted", e)
       }
 
     }
