@@ -189,6 +189,7 @@ class PrintCommands {
     logicalSize ??= ui.window.physicalSize / ui.window.devicePixelRatio;
     imageSize ??= ui.window.physicalSize;
     assert(logicalSize.aspectRatio == imageSize.aspectRatio);
+
     final RenderView renderView = RenderView(
       view: WidgetsFlutterBinding.ensureInitialized()
           .platformDispatcher
