@@ -190,7 +190,7 @@ class PrintCommands {
     imageSize ??= ui.window.physicalSize;
     assert(logicalSize.aspectRatio == imageSize.aspectRatio);
     final RenderView renderView = RenderView(
-      window: WidgetsFlutterBinding.ensureInitialized()
+      view: WidgetsFlutterBinding.ensureInitialized()
           .platformDispatcher
           .views
           .first,
