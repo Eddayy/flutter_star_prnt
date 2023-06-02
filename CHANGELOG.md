@@ -1,3 +1,7 @@
+## 2.4.1
+
+- Add appendMultiple option for android
+
 ## 2.4.0
 
 - Flutter 3.10 support
