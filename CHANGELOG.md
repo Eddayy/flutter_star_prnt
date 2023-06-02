@@ -1,6 +1,6 @@
 ## 2.4.1
 
-- Add appendMultiple option for android
+- Add appendMultiple option for android, credits to @evgk
 
 ## 2.4.0
 
