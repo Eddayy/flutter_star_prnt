@@ -1,3 +1,11 @@
+## 2.4.1
+
+- Add appendMultiple option for android, credits to @evgk
+
+## 2.4.0
+
+- Flutter 3.10 support
+
 ## 2.3.6
 
 - Fix crashes when using usb with android

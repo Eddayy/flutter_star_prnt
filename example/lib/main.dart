@@ -23,12 +23,12 @@ class _MyAppState extends State<MyApp> {
 
   Future<Uint8List> _capturePng() async {
     try {
-      RenderRepaintBoundary boundary =
-          _globalKey.currentContext.findRenderObject();
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData byteData =
+      RenderRepaintBoundary? boundary = _globalKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary!.toImage(pixelRatio: 3.0);
+      ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
-      final pngBytes = byteData.buffer.asUint8List();
+      final pngBytes = byteData!.buffer.asUint8List();
       return pngBytes;
     } catch (e) {
       print(e);
@@ -38,9 +38,9 @@ class _MyAppState extends State<MyApp> {
 
   String emulationFor(String modelName) {
     String emulation = 'StarGraphic';
-    if (modelName != null && modelName != '') {
+    if (modelName != '') {
       final em = StarMicronicsUtilities.detectEmulation(modelName: modelName);
-      emulation = em?.emulation;
+      emulation = em!.emulation!;
     }
     return emulation;
   }
@@ -59,10 +59,10 @@ class _MyAppState extends State<MyApp> {
                 print(list);
                 list.forEach((port) async {
                   print(port.portName);
-                  if (port.portName.isNotEmpty) {
+                  if (port.portName?.isNotEmpty != null) {
                     print(await StarPrnt.getStatus(
-                      portName: port.portName,
-                      emulation: emulationFor(port.modelName),
+                      portName: port.portName!,
+                      emulation: emulationFor(port.modelName!),
                     ));
 
                     PrintCommands commands = PrintCommands();
@@ -94,8 +94,8 @@ class _MyAppState extends State<MyApp> {
                         "And tags attached\n";
                     commands.appendBitmapText(text: raster);
                     print(await StarPrnt.sendCommands(
-                        portName: port.portName,
-                        emulation: emulationFor(port.modelName),
+                        portName: port.portName!,
+                        emulation: emulationFor(port.modelName!),
                         printCommands: commands));
                   }
                 });
@@ -110,10 +110,10 @@ class _MyAppState extends State<MyApp> {
                 print(list);
                 list.forEach((port) async {
                   print(port.portName);
-                  if (port.portName.isNotEmpty) {
+                  if (port.portName?.isNotEmpty != null) {
                     print(await StarPrnt.getStatus(
-                      portName: port.portName,
-                      emulation: emulationFor(port.modelName),
+                      portName: port.portName!,
+                      emulation: emulationFor(port.modelName!),
                     ));
 
                     PrintCommands commands = PrintCommands();
@@ -121,8 +121,8 @@ class _MyAppState extends State<MyApp> {
                         path:
                             'https://c8.alamy.com/comp/MPCNP1/camera-logo-design-photograph-logo-vector-icons-MPCNP1.jpg');
                     print(await StarPrnt.sendCommands(
-                        portName: port.portName,
-                        emulation: emulationFor(port.modelName),
+                        portName: port.portName!,
+                        emulation: emulationFor(port.modelName!),
                         printCommands: commands));
                   }
                 });
@@ -158,10 +158,10 @@ class _MyAppState extends State<MyApp> {
 
                 list.forEach((port) async {
                   print(port.portName);
-                  if (port.portName.isNotEmpty) {
+                  if (port.portName!.isNotEmpty) {
                     print(await StarPrnt.getStatus(
-                      portName: port.portName,
-                      emulation: emulationFor(port.modelName),
+                      portName: port.portName!,
+                      emulation: emulationFor(port.modelName!),
                     ));
 
                     PrintCommands commands = PrintCommands();
@@ -172,8 +172,8 @@ class _MyAppState extends State<MyApp> {
                       alignment: StarAlignmentPosition.Left,
                     );
                     print(await StarPrnt.sendCommands(
-                        portName: port.portName,
-                        emulation: emulationFor(port.modelName),
+                        portName: port.portName!,
+                        emulation: emulationFor(port.modelName!),
                         printCommands: commands));
                   }
                 });

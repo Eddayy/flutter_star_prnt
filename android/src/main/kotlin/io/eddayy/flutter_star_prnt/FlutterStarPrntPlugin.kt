@@ -353,6 +353,8 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
           builder.append(it.get("append").toString().toByteArray(encoding))
       else if (it.containsKey("appendRaw"))
           builder.append(it.get("appendRaw").toString().toByteArray(encoding))
+      else if (it.containsKey("appendMultiple"))
+          builder.appendMultiple(it.get("appendMultiple").toString().toByteArray(encoding), 2, 2)
       else if (it.containsKey("appendEmphasis"))
           builder.appendEmphasis(it.get("appendEmphasis").toString().toByteArray(encoding))
       else if (it.containsKey("enableEmphasis"))
