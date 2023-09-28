@@ -41,7 +41,8 @@ public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
     @JvmStatic
     fun registerWith(registrar: Registrar) {
       val channel = MethodChannel(registrar.messenger(), "flutter_star_prnt")
-      channel.setMethodCallHandler(FlutterStarPrntPlugin())
+      channel.setMethodCallHandler(
+              FlutterStarPrntPlugin())
       FlutterStarPrntPlugin.setupPlugin(registrar.messenger(), registrar.context())
     }
     @JvmStatic
