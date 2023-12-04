@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  String logText = "";
   GlobalKey _globalKey = new GlobalKey();
   bool isLoading = false;
   Widget? widgetToPrint;
@@ -43,6 +44,7 @@ class _MyAppState extends State<MyApp> {
         return Uint8List(0);
       }
     } catch (e) {
+      logText += e.toString();
       print(e);
       return Uint8List(0);
     }
@@ -59,11 +61,12 @@ class _MyAppState extends State<MyApp> {
 
   void findAllPrinterAndSendCommand(PrintCommands commands) async {
     Stopwatch stopwatch = Stopwatch()..start();
-    List<PortInfo> list = await StarPrnt.portDiscovery(StarPortType.All);
+    List<PortInfo> list = await StarPrnt.portDiscovery(StarPortType.USB);
     print(list);
-    print('Port discovered after ${stopwatch.elapsed}');
+    print('Port discovered after ${stopwatch.elapsed} count ${list.length}');
     for (final port in list) {
       print(port.portName);
+      logText += port.portName ?? "";
       if (port.portName!.isNotEmpty) {
         print(await StarPrnt.getStatus(
           portName: port.portName!,
@@ -198,6 +201,7 @@ class _MyAppState extends State<MyApp> {
               },
               child: Text('Print Double size text'),
             ),
+            Text('Print from text'),
           ],
         ),
       ),
