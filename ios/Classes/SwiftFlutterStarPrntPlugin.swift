@@ -4,6 +4,7 @@ import StarIO
 import StarIO_Extension
 
 public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
+    let SM_TRUE =  SM_TRUESHARED
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter_star_prnt", binaryMessenger: registrar.messenger())
     let instance = SwiftFlutterStarPrntPlugin()
@@ -30,22 +31,23 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         let type = arguments["type"] as! String
         do {
             var info = [Dictionary<String,String>]()
-            if ( type == "Bluetooth" || type == "All") {
-                let btPortInfoArray = try SMPort.searchPrinter(target: "BT:")
+            var searchPrinterResult: [PortInfo]? = nil
+            switch type {
+            case "LAN"  :
+                searchPrinterResult = try SMPort.searchPrinter(target: "TCP:") as? [PortInfo]
+            case "Bluetooth"  :     // Bluetooth
+                searchPrinterResult = try SMPort.searchPrinter(target: "BT:")  as? [PortInfo]
+            case "BLE"  :     // Bluetooth Low Energy
+                searchPrinterResult = try SMPort.searchPrinter(target: "BLE:") as? [PortInfo]
+            case "USB"  :     // USB
+                searchPrinterResult = try SMPort.searchPrinter(target: "USB:") as? [PortInfo]
+//          case 5  :     // All
+            default :
+                searchPrinterResult = try SMPort.searchPrinter(target: "ALL:") as? [PortInfo]
+            }
+            if let btPortInfoArray = searchPrinterResult{
                 for printer in btPortInfoArray {
-                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
-                }
-            }
-            if ( type == "LAN" || type == "All") {
-                let lanPortInfoArray = try SMPort.searchPrinter(target: "TCP:")
-                for printer in lanPortInfoArray {
-                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
-                }
-            }
-            if ( type == "USB" || type == "All") {
-                let usbPortInfoArray = try SMPort.searchPrinter(target: "USB:")
-                for printer in usbPortInfoArray {
-                    info.append(portInfoToDictionary(portInfo: printer as! PortInfo))
+                    info.append(portInfoToDictionary(portInfo: printer ))
                 }
             }
             result(info)
@@ -94,15 +96,22 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
         let portName = arguments["portName"] as! String
         let emulation = arguments["emulation"] as! String
         let printCommands = arguments["printCommands"] as! Array<Dictionary<String,Any>>
-
-        
+        let fastPrint = (arguments["fastPrint"] as? NSNumber)?.boolValue ?? false
+        let useStartEndBlock =  (arguments["useStartEndBlock"] as? NSNumber)?.boolValue ?? false
+        let fastPrintWithBlock = (arguments["fastPrintWithBlock"] as? NSNumber)?.boolValue ?? false
         let portSettings :String = getPortSettingsOption(emulation)
         let starEmulation :StarIoExtEmulation = getEmulation(emulation)
         let builder:ISCBBuilder = StarIoExt.createCommandBuilder(starEmulation)
         builder.beginDocument()
         appendCommands(builder: builder, printCommands: printCommands)
         builder.endDocument()
-        sendCommand(portName: portName, portSetting: portSettings, command: [UInt8](builder.commands.copy() as! Data),result: result)
+        let cmds = [UInt8](builder.commands.copy() as! Data)
+        if fastPrint {
+            sendCommandSpeedOptimize(portName: portName, portSetting: portSettings, command: cmds, useStartEndBlock: useStartEndBlock, fastPrintWithBlock: fastPrintWithBlock, result: result)
+        }else{
+            sendCommand(portName: portName, portSetting: portSettings, command: cmds,result: result)
+        }
+        
         
     }
     
@@ -122,8 +131,33 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
             default: return emulation
         }
     }
+    func getIsAvailableForPrintUpdateErrorAndInfoMessage( json:inout Dictionary<AnyHashable,Any>,status: StarPrinterStatus_2) -> Bool {
+        
+        var retVal = true;
+        if (status.coverOpen == SM_TRUE) {
+          json["error_message"] = "Printer cover is open"
+         retVal = false
+        } else if (status.receiptPaperEmpty == SM_TRUE) {
+          json["error_message"] = "Paper empty"
+          retVal = false
+        }else if (status.presenterPaperJamError == SM_TRUE) {
+          json["error_message"] = "Paper Jam"
+          retVal = false
+        }else if (status.offline == SM_TRUE) {
+          json["error_message"] = "A printer is offline"
+          retVal = false
+        }
+        if (status.receiptPaperNearEmptyInner == SM_TRUE || status.receiptPaperNearEmptyOuter == SM_TRUE){
+            if json["error_message"] == nil  {
+                json["error_message"] = "Paper near empty"
+            }
+            json["info_message"] = "Paper near empty"
+          
+        }
+        return retVal
+    }
     func portStatusToDictionary(status: StarPrinterStatus_2,firmwareInformation:Dictionary<AnyHashable,Any>,errorMsg:String?) ->Dictionary<AnyHashable,Any> {
-        let SM_TRUE =  SM_TRUESHARED
+        
         let dict: Dictionary<AnyHashable,Any> =  [
             "coverOpen" :status.coverOpen == SM_TRUE,
             "offline": status.offline == SM_TRUE,
@@ -220,9 +254,9 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
                 let height = command["height"] != nil ? command["height"] as! Int : 2
                 builder.appendData(withMultiple: (command["appendMultiple"] as! String).data(using: encoding), width: width, height: height)
             } else if (command["enableMultiple"] != nil) {
-                let width = command["width"] != nil ? command["width"] as! Int : 1
-                let height = command["height"] != nil ? command["height"] as! Int : 1
                 if ( command["enableMultiple"] as! Bool) == true {
+                    let width = command["width"] != nil ? command["width"] as! Int : 1
+                    let height = command["height"] != nil ? command["height"] as! Int : 1
                     builder.appendMultiple(width, height: height)
                 } else {
                     builder.appendMultiple(1, height: 1)
@@ -704,65 +738,116 @@ public class SwiftFlutterStarPrntPlugin: NSObject, FlutterPlugin {
 
         return imageToPrint
     }
+//    For debugging don't delete
+//    @discardableResult
+//    func printTimeElapsed(forAction:String,startTime:DispatchTime) -> DispatchTime {
+//        let retTime = DispatchTime.now()
+//        let nanoTime = retTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+//        let timeInterval = Double(nanoTime) / 1_000_000_000
+//        debugPrint("Time for \(forAction): \(timeInterval) seconds")
+//        return retTime
+//    }
     func sendCommand(portName:String,portSetting:String,command:[UInt8],result: FlutterResult){
         var port :SMPort
         var status: StarPrinterStatus_2 = StarPrinterStatus_2()
-
         do {
             port = try SMPort.getPort(portName: portName, portSettings: portSetting, ioTimeoutMillis: 10000)
-            let SM_TRUE =  SM_TRUESHARED
-            
             var json = Dictionary<AnyHashable, Any>()
             defer {
                 SMPort.release(port)
             }
             usleep(200000)
+            
             try port.beginCheckedBlock(starPrinterStatus: &status, level: 2)
             json = portStatusToDictionary(status: status, firmwareInformation: [String:Any](),errorMsg: nil)
-            var isSucess = true
-             if (status.coverOpen == SM_TRUE) {
-              json["error_message"] = "Printer cover is open"
-              isSucess = false
-            } else if (status.receiptPaperEmpty == SM_TRUE) {
-              json["error_message"] = "Paper empty"
-              isSucess = false
-            }else if (status.presenterPaperJamError == SM_TRUE) {
-              json["error_message"] = "Paper Jam"
-              isSucess = false
-            }else if (status.offline == SM_TRUE) {
-              json["error_message"] = "A printer is offline"
-              isSucess = false
-            }
-
-            if (status.receiptPaperNearEmptyInner == SM_TRUE || status.receiptPaperNearEmptyOuter == SM_TRUE){
-              json["info_message"] = "Paper near empty"
-            }
+            var isSucess = getIsAvailableForPrintUpdateErrorAndInfoMessage(json: &json, status: status)
             if isSucess {
                 var total: UInt32 = 0
                 while total < UInt32(command.count) {
                     var written: UInt32 = 0
                     try port.write(writeBuffer: command, offset: total, size: UInt32(command.count) - total, numberOfBytesWritten: &written)
                     total += written
+                    
                 }
+                port.endCheckedBlockTimeoutMillis = 3000
                 try port.endCheckedBlock(starPrinterStatus: &status, level: 2)
                 let newStat = portStatusToDictionary(status: status, firmwareInformation: [String:Any](),errorMsg: nil)
                 
                 json.merge(newStat) {  (current, _) in current}
-                if (status.coverOpen == SM_TRUE) {
-                  json["error_message"] = "Printer cover is open"
-                } else if (status.receiptPaperEmpty == SM_TRUE) {
-                  json["error_message"] = "Paper empty"
-                }else if (status.presenterPaperJamError == SM_TRUE) {
-                  json["error_message"] = "Paper Jam"
-                }else if (status.offline == SM_TRUE) {
-                  json["error_message"] = "A printer is offline"
-                  isSucess = false
+                isSucess = getIsAvailableForPrintUpdateErrorAndInfoMessage(json: &json, status: status)
+            }
+            json["is_success"] = isSucess
+            result(json)
+
+        } catch {
+            result(
+              FlutterError.init(code: "STARIO_PRINT_EXCEPTION", message: error.localizedDescription, details: nil)
+          )
+        }
+    }
+    //sendCommandsDoNotCheckCondition +
+    func sendCommandSpeedOptimize(portName:String,portSetting:String,command:[UInt8],useStartEndBlock:Bool,fastPrintWithBlock:Bool, result: FlutterResult){
+        var port :SMPort
+        var status: StarPrinterStatus_2 = StarPrinterStatus_2()
+//        let start = DispatchTime.now()
+        do {
+            // Timeout here will not affect the time for print , it is the maximum time which printer will give for the operation . after the printer will clear this opertation
+            
+            // Random testing on TSP650II from simulator took 0.010052266 seconds
+            port = try SMPort.getPort(portName: portName, portSettings: portSetting, ioTimeoutMillis: 10000)
+            var json = Dictionary<AnyHashable, Any>()
+            defer {
+                // Random testing on TSP650II from simulator took 0.001288902 seconds
+                SMPort.release(port)
+                //printTimeElapsed(forAction: "Total time for operation ", startTime: start)
+            }
+            // Sleep to avoid a problem which sometimes cannot communicate with Bluetooth.
+            // (Refer Readme for details)
+            // Sleeping only if bluetooth
+            if #available(iOS 11.0, *), portName.uppercased().hasPrefix("BT:") {
+                Thread.sleep(forTimeInterval: 0.2)
+            }
+            var isSucess = true
+            if useStartEndBlock {
+                if fastPrintWithBlock {
+                    // Random testing on TSP650II from simulator took 0.015870016 seconds
+                    try port.getParsedStatus(starPrinterStatus: &status, level: 2)
+                }else{
+                    // Random testing on TSP650II from simulator took 0.660638043 seconds
+                    try port.beginCheckedBlock(starPrinterStatus: &status, level: 2)
                 }
+                json = portStatusToDictionary(status: status, firmwareInformation: [String:Any](),errorMsg: nil)
+                isSucess = getIsAvailableForPrintUpdateErrorAndInfoMessage(json: &json, status: status)
+            }
+            if isSucess {
+                var total: UInt32 = 0
+                while total < UInt32(command.count) {
+                    var written: UInt32 = 0
+                    // Random testing on TSP650II from simulator sending 31156 byte took 0.000396307 seconds"
+                    try port.write(writeBuffer: command, offset: total, size: UInt32(command.count) - total, numberOfBytesWritten: &written)
+                    total += written
+                }
+                
+                if useStartEndBlock {
+                    if fastPrintWithBlock {
+                        // Random testing on TSP650II from simulator took 0.015870016 seconds
+                        try port.getParsedStatus(starPrinterStatus: &status, level: 2)
+                    }else{
+                        
+                        // Timeout here will not affect the time for operation , this means if the library fails to get response after 3sec it will return with error
+                        
+                        // Random testing on TSP650II from simulator took 1.470802848 seconds
+                        port.endCheckedBlockTimeoutMillis = 3000
+                        try port.endCheckedBlock(starPrinterStatus: &status, level: 2)
+                    }
+                }else {
+                    try port.getParsedStatus(starPrinterStatus: &status, level: 2)
+                }
+                json = portStatusToDictionary(status: status, firmwareInformation: [String:Any](),errorMsg: nil)
+                isSucess = getIsAvailableForPrintUpdateErrorAndInfoMessage(json: &json, status: status)
+                
             }
         
-            if (status.receiptPaperNearEmptyInner == SM_TRUE || status.receiptPaperNearEmptyOuter == SM_TRUE){
-              json["error_message"] = "Paper near empty"
-            }
             json["is_success"] = isSucess
             result(json)
 
