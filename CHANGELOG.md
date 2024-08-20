@@ -1,3 +1,7 @@
+## 2.4.2
+
+- Fixed no named parameter with the name 'size'. print_commands issue, credits to [@khp53](https://github.com/khp53)
+
 ## 2.4.1
 
 - Add appendMultiple option for android, credits to @evgk

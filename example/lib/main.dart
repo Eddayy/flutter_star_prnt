@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
     try {
       RenderRepaintBoundary? boundary = _globalKey.currentContext!
           .findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary!.toImage(pixelRatio: 3.0);
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       final pngBytes = byteData!.buffer.asUint8List();
