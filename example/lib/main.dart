@@ -23,11 +23,10 @@ class _MyAppState extends State<MyApp> {
 
   Future<Uint8List> _capturePng() async {
     try {
-      RenderRepaintBoundary? boundary = _globalKey.currentContext!
-          .findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary!.toImage(pixelRatio: 3.0);
-      ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      RenderRepaintBoundary? boundary =
+          _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final pngBytes = byteData!.buffer.asUint8List();
       return pngBytes;
     } catch (e) {
@@ -54,8 +53,7 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             TextButton(
               onPressed: () async {
-                List<PortInfo> list =
-                    await StarPrnt.portDiscovery(StarPortType.All);
+                List<PortInfo> list = await StarPrnt.portDiscovery(StarPortType.LAN);
                 print(list);
                 list.forEach((port) async {
                   print(port.portName);
@@ -105,8 +103,7 @@ class _MyAppState extends State<MyApp> {
             TextButton(
               onPressed: () async {
                 //FilePickerResult file = await FilePicker.platform.pickFiles();
-                List<PortInfo> list =
-                    await StarPrnt.portDiscovery(StarPortType.All);
+                List<PortInfo> list = await StarPrnt.portDiscovery(StarPortType.LAN);
                 print(list);
                 list.forEach((port) async {
                   print(port.portName);
@@ -152,8 +149,7 @@ class _MyAppState extends State<MyApp> {
                   isLoading = true;
                 });
                 //FilePickerResult file = await FilePicker.platform.pickFiles();
-                List<PortInfo> list =
-                    await StarPrnt.portDiscovery(StarPortType.All);
+                List<PortInfo> list = await StarPrnt.portDiscovery(StarPortType.LAN);
                 print(list);
 
                 list.forEach((port) async {
