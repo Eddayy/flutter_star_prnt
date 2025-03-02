@@ -11,3 +11,4 @@ build/
 android/bin/
 
 **/android/local.properties
+*.cxx/

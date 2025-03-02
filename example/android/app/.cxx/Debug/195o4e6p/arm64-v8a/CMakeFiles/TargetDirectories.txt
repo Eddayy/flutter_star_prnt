@@ -1,0 +1,2 @@
+/Users/phenomtec/Documents/GitHub/flutter_star_prnt/example/android/app/.cxx/Debug/195o4e6p/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/phenomtec/Documents/GitHub/flutter_star_prnt/example/android/app/.cxx/Debug/195o4e6p/arm64-v8a/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,1 @@
+/Users/phenomtec/Documents/GitHub/flutter_star_prnt/example/build/app/intermediates/cxx/Debug/195o4e6p/obj/arm64-v8a

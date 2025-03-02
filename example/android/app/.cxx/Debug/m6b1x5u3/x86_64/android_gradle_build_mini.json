@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/phenomtec/development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/phenomtec/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/phenomtec/Documents/GitHub/flutter_star_prnt/example/android/app/.cxx/Debug/m6b1x5u3/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/phenomtec/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/phenomtec/Documents/GitHub/flutter_star_prnt/example/android/app/.cxx/Debug/m6b1x5u3/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
