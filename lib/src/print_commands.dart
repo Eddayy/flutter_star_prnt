@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_star_prnt/src/enums.dart';
@@ -50,8 +51,7 @@ class PrintCommands {
     command['bothScale'] = bothScale;
     command['diffusion'] = diffusion;
     command['width'] = width;
-    if (absolutePosition != null)
-      command['absolutePosition'] = absolutePosition;
+    if (absolutePosition != null) command['absolutePosition'] = absolutePosition;
     if (alignment != null) command['alignment'] = alignment.text;
     if (rotation != null) command['rotation'] = rotation.text;
 
@@ -78,8 +78,7 @@ class PrintCommands {
     command['bothScale'] = bothScale;
     command['diffusion'] = diffusion;
     command['width'] = width;
-    if (absolutePosition != null)
-      command['absolutePosition'] = absolutePosition;
+    if (absolutePosition != null) command['absolutePosition'] = absolutePosition;
     if (alignment != null) command['alignment'] = alignment.text;
     if (rotation != null) command['rotation'] = rotation.text;
 
@@ -156,8 +155,7 @@ class PrintCommands {
     command['diffusion'] = diffusion;
     if (fontSize != null) command['fontSize'] = fontSize;
     if (width != null) command['width'] = width;
-    if (absolutePosition != null)
-      command['absolutePosition'] = absolutePosition;
+    if (absolutePosition != null) command['absolutePosition'] = absolutePosition;
     if (alignment != null) command['alignment'] = alignment.text;
     if (rotation != null) command['rotation'] = rotation.text;
 
@@ -188,21 +186,19 @@ class PrintCommands {
     TextDirection textDirection = TextDirection.ltr,
   }) async {
     final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
-    logicalSize ??=
-        View.of(context).physicalSize / View.of(context).devicePixelRatio;
+    logicalSize ??= View.of(context).physicalSize / View.of(context).devicePixelRatio;
     imageSize ??= View.of(context).physicalSize;
     assert(logicalSize.aspectRatio == imageSize.aspectRatio);
+    FlutterView view = WidgetsFlutterBinding.ensureInitialized().platformDispatcher.views.first;
     final RenderView renderView = RenderView(
-      view: WidgetsFlutterBinding.ensureInitialized()
-          .platformDispatcher
-          .views
-          .first,
+      view: view,
       child: RenderPositionedBox(
         alignment: Alignment.center,
         child: repaintBoundary,
       ),
       configuration: ViewConfiguration(
-        size: logicalSize,
+        physicalConstraints: BoxConstraints.tight(logicalSize) * view.devicePixelRatio,
+        logicalConstraints: BoxConstraints.tight(logicalSize),
         devicePixelRatio: 1.0,
       ),
     );
@@ -213,8 +209,7 @@ class PrintCommands {
     pipelineOwner.rootNode = renderView;
     renderView.prepareInitialFrame();
 
-    final RenderObjectToWidgetElement<RenderBox> rootElement =
-        RenderObjectToWidgetAdapter<RenderBox>(
+    final RenderObjectToWidgetElement<RenderBox> rootElement = RenderObjectToWidgetAdapter<RenderBox>(
       container: repaintBoundary,
       child: Directionality(
         textDirection: textDirection,
@@ -240,8 +235,7 @@ class PrintCommands {
     final ui.Image image = await repaintBoundary.toImage(
       pixelRatio: imageSize.width / logicalSize.width,
     );
-    final ByteData? byteData =
-        await image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
     return byteData?.buffer.asUint8List();
   }

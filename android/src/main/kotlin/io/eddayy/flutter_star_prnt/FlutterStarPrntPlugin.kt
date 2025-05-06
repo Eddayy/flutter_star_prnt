@@ -10,110 +10,69 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.Log
+import android.webkit.URLUtil
 import androidx.annotation.NonNull
 import com.starmicronics.stario.PortInfo
 import com.starmicronics.stario.StarIOPort
 import com.starmicronics.stario.StarPrinterStatus
-import com.starmicronics.starioextension.ICommandBuilder
-import com.starmicronics.starioextension.ICommandBuilder.*
-import com.starmicronics.starioextension.IConnectionCallback
-import com.starmicronics.starioextension.StarIoExt
+import com.starmicronics.starioextension.*
+import com.starmicronics.starioextension.ICommandBuilder.CodePageType
+import com.starmicronics.starioextension.ICommandBuilder.CutPaperAction
 import com.starmicronics.starioextension.StarIoExt.Emulation
-import com.starmicronics.starioextension.StarIoExtManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
-import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
-import android.webkit.URLUtil
 
-/** FlutterStarPrntPlugin */
-public class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
-  protected var starIoExtManager: StarIoExtManager? = null
-  companion object {
-    protected lateinit var applicationContext: Context
+class FlutterStarPrntPlugin : FlutterPlugin, MethodCallHandler {
+    protected var starIoExtManager: StarIoExtManager? = null
 
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "flutter_star_prnt")
-      channel.setMethodCallHandler(FlutterStarPrntPlugin())
-      FlutterStarPrntPlugin.setupPlugin(registrar.messenger(), registrar.context())
+    companion object {
+        protected lateinit var applicationContext: Context
     }
-    @JvmStatic
-    fun setupPlugin(messenger: BinaryMessenger, context: Context) {
-      try {
-        applicationContext = context.getApplicationContext()
-        val channel = MethodChannel(messenger, "flutter_star_prnt")
-        channel.setMethodCallHandler(FlutterStarPrntPlugin())
-      } catch (e: Exception) {
-          Log.e("FlutterStarPrnt", "Registration failed", e)
-      }
+
+    override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        applicationContext = binding.applicationContext
+        val channel = MethodChannel(binding.binaryMessenger, "flutter_star_prnt")
+        channel.setMethodCallHandler(this)
     }
-  }
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_star_prnt")
-    channel.setMethodCallHandler(FlutterStarPrntPlugin())
-    setupPlugin(flutterPluginBinding.getFlutterEngine().getDartExecutor(), flutterPluginBinding.getApplicationContext())
-  }
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull rawResult: Result) {
-    val result: MethodResultWrapper = MethodResultWrapper(rawResult)
-    Thread(MethodRunner(call, result)).start()
-  }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {}
-  inner class MethodRunner(call: MethodCall, result: Result) : Runnable {
-    private val call: MethodCall = call
-    private val result: Result = result
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {}
 
-    override fun run() {
-      when (call.method) {
-        "portDiscovery" -> {
-          portDiscovery(call, result)
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        val resultWrapper = MethodResultWrapper(result)
+        Thread(MethodRunner(call, resultWrapper)).start()
+    }
+
+    inner class MethodRunner(private val call: MethodCall, private val result: Result) : Runnable {
+        override fun run() {
+            when (call.method) {
+                "portDiscovery" -> portDiscovery(call, result)
+                "checkStatus" -> checkStatus(call, result)
+                "print" -> print(call, result)
+                else -> result.notImplemented()
+            }
         }
-        "checkStatus" -> {
-          checkStatus(call, result)
+    }
+
+    class MethodResultWrapper(private val methodResult: Result) : Result {
+        private val handler = Handler(Looper.getMainLooper())
+
+        override fun success(result: Any?) {
+            handler.post { methodResult.success(result) }
         }
-        "print" -> {
-          print(call, result)
+
+        override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+            handler.post { methodResult.error(errorCode, errorMessage, errorDetails) }
         }
-        else -> result.notImplemented()
-      }
-    }
-  }
-  class MethodResultWrapper(methodResult: Result) : Result {
 
-    private val methodResult: Result = methodResult
-    private val handler: Handler = Handler(Looper.getMainLooper())
-
-    public override fun success(result: Any?) {
-        handler.post(object : Runnable {
-          override fun run() {
-            methodResult.success(result)
-          }
-        })
+        override fun notImplemented() {
+            handler.post { methodResult.notImplemented() }
+        }
     }
-
-    public override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-        handler.post(object : Runnable {
-          override fun run() {
-            methodResult.error(errorCode, errorMessage, errorDetails)
-          }
-        })
-    }
-
-    public override fun notImplemented() {
-        handler.post(object : Runnable {
-          override fun run() {
-            methodResult.notImplemented()
-          }
-        })
-    }
-  }
   public fun portDiscovery(@NonNull call: MethodCall, @NonNull result: Result) {
     val strInterface: String = call.argument<String>("type") as String
     val response: MutableList<Map<String, String>>
