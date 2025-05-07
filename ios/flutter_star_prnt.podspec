@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'Frameworks/*.framework'
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 
-    'DEFINES_MODULE' => 'NO', 
+    'DEFINES_MODULE' => 'NO', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64'
   }
   s.xcconfig = { "OTHER_LDFLAGS" => '$(inherited) -framework "ExternalAccessory" -framework "CoreBluetooth" -framework "StarIO" -framework "StarIO_Extension"' }
   s.swift_version = '5.0'

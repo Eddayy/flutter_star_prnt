@@ -14,8 +14,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  String logText = "";
   GlobalKey _globalKey = new GlobalKey();
   bool isLoading = false;
+  Widget? widgetToPrint;
   @override
   void initState() {
     super.initState();
@@ -23,26 +25,69 @@ class _MyAppState extends State<MyApp> {
 
   Future<Uint8List> _capturePng() async {
     try {
-      RenderRepaintBoundary? boundary = _globalKey.currentContext!
+      // if (widgetToPrint != null) {
+      //   // using starprinter image generator function
+      //   final img = await PrintCommands.createImageFromWidget(widgetToPrint);
+      //   if (img.length > 0) {
+      //     // suceeds using generated image
+      //     return img;
+      //   }
+      // }
+      RenderRepaintBoundary boundary = _globalKey.currentContext!
           .findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary!.toImage(pixelRatio: 3.0);
-      ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      final pngBytes = byteData!.buffer.asUint8List();
-      return pngBytes;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData != null) {
+        final pngBytes = byteData.buffer.asUint8List();
+        return pngBytes;
+      } else {
+        return Uint8List(0);
+      }
     } catch (e) {
+      logText += e.toString();
       print(e);
       return Uint8List(0);
     }
   }
 
-  String emulationFor(String modelName) {
-    String emulation = 'StarGraphic';
-    if (modelName != '') {
+  String? emulationFor(String? modelName) {
+    String? emulation = 'StarGraphic';
+    if (modelName != null && modelName != '') {
       final em = StarMicronicsUtilities.detectEmulation(modelName: modelName);
-      emulation = em!.emulation!;
+      emulation = em?.emulation;
     }
     return emulation;
+  }
+
+  void findAllPrinterAndSendCommand(PrintCommands commands) async {
+    Stopwatch stopwatch = Stopwatch()..start();
+    List<PortInfo> list = await StarPrnt.portDiscovery(StarPortType.USB);
+    print(list);
+    print('Port discovered after ${stopwatch.elapsed} count ${list.length}');
+    for (final port in list) {
+      print(port.portName);
+      logText += port.portName ?? "";
+      if (port.portName!.isNotEmpty) {
+        print(await StarPrnt.getStatus(
+          portName: port.portName!,
+          emulation: emulationFor(port.modelName)!,
+        ));
+        print('got status of ${port.portName} at ${stopwatch.elapsed}');
+
+        print(await StarPrnt.sendCommands(
+          portName: port.portName!,
+          emulation: emulationFor(port.modelName)!,
+          printCommands: commands,
+          // useStartEndBlock: false,
+        ));
+        print('print completed of ${port.portName} at ${stopwatch.elapsed}');
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
+    print('completing every thing at ${stopwatch.elapsed}');
+    stopwatch.stop();
   }
 
   @override
@@ -54,78 +99,49 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             TextButton(
               onPressed: () async {
-                List<PortInfo> list =
-                    await StarPrnt.portDiscovery(StarPortType.All);
-                print(list);
-                list.forEach((port) async {
-                  print(port.portName);
-                  if (port.portName?.isNotEmpty != null) {
-                    print(await StarPrnt.getStatus(
-                      portName: port.portName!,
-                      emulation: emulationFor(port.modelName!),
-                    ));
-
-                    PrintCommands commands = PrintCommands();
-                    String raster = "        Star Clothing Boutique\n" +
-                        "             123 Star Road\n" +
-                        "           City, State 12345\n" +
-                        "\n" +
-                        "Date:MM/DD/YYYY          Time:HH:MM PM\n" +
-                        "--------------------------------------\n" +
-                        "SALE\n" +
-                        "SKU            Description       Total\n" +
-                        "300678566      PLAIN T-SHIRT     10.99\n" +
-                        "300692003      BLACK DENIM       29.99\n" +
-                        "300651148      BLUE DENIM        29.99\n" +
-                        "300642980      STRIPED DRESS     49.99\n" +
-                        "30063847       BLACK BOOTS       35.99\n" +
-                        "\n" +
-                        "Subtotal                        156.95\n" +
-                        "Tax                               0.00\n" +
-                        "--------------------------------------\n" +
-                        "Total                           156.95\n" +
-                        "--------------------------------------\n" +
-                        "\n" +
-                        "Charge\n" +
-                        "156.95\n" +
-                        "Visa XXXX-XXXX-XXXX-0123\n" +
-                        "Refunds and Exchanges\n" +
-                        "Within 30 days with receipt\n" +
-                        "And tags attached\n";
-                    commands.appendBitmapText(text: raster);
-                    print(await StarPrnt.sendCommands(
-                        portName: port.portName!,
-                        emulation: emulationFor(port.modelName!),
-                        printCommands: commands));
-                  }
-                });
+                PrintCommands commands = PrintCommands();
+                String raster = "        Star Clothing Boutique\n" +
+                    "             123 Star Road\n" +
+                    "           City, State 12345\n" +
+                    "\n" +
+                    "Date:MM/DD/YYYY          Time:HH:MM PM\n" +
+                    "--------------------------------------\n" +
+                    "SALE\n" +
+                    "SKU            Description       Total\n" +
+                    "300678566      PLAIN T-SHIRT     10.99\n" +
+                    "300692003      BLACK DENIM       29.99\n" +
+                    "300651148      BLUE DENIM        29.99\n" +
+                    "300642980      STRIPED DRESS     49.99\n" +
+                    "30063847       BLACK BOOTS       35.99\n" +
+                    "\n" +
+                    "Subtotal                        156.95\n" +
+                    "Tax                               0.00\n" +
+                    "--------------------------------------\n" +
+                    "Total                           156.95\n" +
+                    "--------------------------------------\n" +
+                    "\n" +
+                    "Charge\n" +
+                    "156.95\n" +
+                    "Visa XXXX-XXXX-XXXX-0123\n" +
+                    "Refunds and Exchanges\n" +
+                    "Within 30 days with receipt\n" +
+                    "And tags attached\n";
+                commands.appendBitmapText(text: raster);
+                findAllPrinterAndSendCommand(commands);
               },
               child: Text('Print from text'),
             ),
             TextButton(
               onPressed: () async {
-                //FilePickerResult file = await FilePicker.platform.pickFiles();
-                List<PortInfo> list =
-                    await StarPrnt.portDiscovery(StarPortType.All);
-                print(list);
-                list.forEach((port) async {
-                  print(port.portName);
-                  if (port.portName?.isNotEmpty != null) {
-                    print(await StarPrnt.getStatus(
-                      portName: port.portName!,
-                      emulation: emulationFor(port.modelName!),
-                    ));
-
-                    PrintCommands commands = PrintCommands();
-                    commands.appendBitmap(
-                        path:
-                            'https://c8.alamy.com/comp/MPCNP1/camera-logo-design-photograph-logo-vector-icons-MPCNP1.jpg');
-                    print(await StarPrnt.sendCommands(
-                        portName: port.portName!,
-                        emulation: emulationFor(port.modelName!),
-                        printCommands: commands));
-                  }
+                setState(() {
+                  isLoading = true;
                 });
+                PrintCommands commands = PrintCommands();
+                commands.appendBitmap(
+                    path:
+                        'https://c8.alamy.com/comp/MPCNP1/camera-logo-design-photograph-logo-vector-icons-MPCNP1.jpg');
+                findAllPrinterAndSendCommand(commands);
+
                 setState(() {
                   isLoading = false;
                 });
@@ -140,7 +156,11 @@ class _MyAppState extends State<MyApp> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('This is a text to print as image , for 3\''),
+                    Text(
+                      'This is a text to print as image , for 3\'',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 50),
+                    ),
                   ],
                 ),
               ),
@@ -151,38 +171,37 @@ class _MyAppState extends State<MyApp> {
                 setState(() {
                   isLoading = true;
                 });
-                //FilePickerResult file = await FilePicker.platform.pickFiles();
-                List<PortInfo> list =
-                    await StarPrnt.portDiscovery(StarPortType.All);
-                print(list);
 
-                list.forEach((port) async {
-                  print(port.portName);
-                  if (port.portName!.isNotEmpty) {
-                    print(await StarPrnt.getStatus(
-                      portName: port.portName!,
-                      emulation: emulationFor(port.modelName!),
-                    ));
-
-                    PrintCommands commands = PrintCommands();
-                    commands.appendBitmapByte(
-                      byteData: img,
-                      diffusion: true,
-                      bothScale: true,
-                      alignment: StarAlignmentPosition.Left,
-                    );
-                    print(await StarPrnt.sendCommands(
-                        portName: port.portName!,
-                        emulation: emulationFor(port.modelName!),
-                        printCommands: commands));
-                  }
-                });
-                setState(() {
-                  isLoading = false;
-                });
+                PrintCommands commands = PrintCommands();
+                commands.appendBitmapByte(
+                  byteData: img,
+                  diffusion: true,
+                  bothScale: true,
+                  alignment: StarAlignmentPosition.Left,
+                );
+                findAllPrinterAndSendCommand(commands);
               },
               child: Text('Print from genrated image'),
             ),
+            TextButton(
+              onPressed: () async {
+                final img = await _capturePng();
+                setState(() {
+                  isLoading = true;
+                });
+
+                PrintCommands commands = PrintCommands();
+                Map<String, dynamic> command = {
+                  "appendMultiple": "\n\nHello\nLarge Text\n",
+                };
+                command['width'] = 2;
+                command['height'] = 2;
+                commands.push(command);
+                findAllPrinterAndSendCommand(commands);
+              },
+              child: Text('Print Double size text'),
+            ),
+            Text('Print from text'),
           ],
         ),
       ),
